@@ -45,7 +45,7 @@
                     <h5 class="mb-0">Order Items</h5>
                 </div>
                 <div class="card-body">
-                    {% for item in order.items %}
+                    {% for item in order.order_items %}
                     <div class="d-flex align-items-center py-3">
                         <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" 
                              class="order-item-image me-3">
