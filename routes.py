@@ -210,6 +210,13 @@ def checkout_shipping():
         return redirect(url_for('products'))
     
     if request.method == 'POST':
+        # Validate required fields
+        required_fields = ['full_name', 'address_line1', 'city', 'state', 'postal_code', 'country']
+        for field in required_fields:
+            if not request.form.get(field):
+                flash(f'Please fill in the {field.replace("_", " ").title()} field', 'error')
+                return redirect(url_for('checkout_shipping'))
+        
         # Store shipping info in session
         session['shipping_info'] = {
             'full_name': request.form['full_name'],
@@ -221,15 +228,17 @@ def checkout_shipping():
             'country': request.form['country'],
             'phone': request.form.get('phone', '')
         }
+        session.modified = True
+        flash('Shipping information saved successfully!', 'success')
         return redirect(url_for('checkout_payment'))
     
     # Pre-fill with user information if available
     user_info = {
-        'full_name': getattr(current_user, 'first_name', '') + ' ' + getattr(current_user, 'last_name', ''),
+        'full_name': (getattr(current_user, 'first_name', '') + ' ' + getattr(current_user, 'last_name', '')).strip() or current_user.username,
         'phone': getattr(current_user, 'phone', '') or ''
     }
     
-    return render_template('checkout/shipping.html', user_info=user_info)
+    return render_template('checkout/shipping.html', user_info=user_info)</old_str>
 
 @app.route('/checkout/payment', methods=['GET', 'POST'])
 @login_required
@@ -247,15 +256,31 @@ def checkout_payment():
         return redirect(url_for('checkout_shipping'))
     
     if request.method == 'POST':
+        # Validate payment method
+        payment_method = request.form.get('payment_method')
+        if not payment_method:
+            flash('Please select a payment method', 'error')
+            return redirect(url_for('checkout_payment'))
+        
+        # Validate credit card info if credit card is selected
+        if payment_method == 'credit_card':
+            required_fields = ['card_name', 'card_number', 'expiry_month', 'expiry_year', 'cvv']
+            for field in required_fields:
+                if not request.form.get(field):
+                    flash(f'Please fill in the {field.replace("_", " ").title()} field', 'error')
+                    return redirect(url_for('checkout_payment'))
+        
         # Store payment info in session (in real app, process payment here)
         session['payment_info'] = {
-            'payment_method': request.form['payment_method'],
+            'payment_method': payment_method,
             'card_name': request.form.get('card_name', ''),
             'card_number': request.form.get('card_number', ''),
             'expiry_month': request.form.get('expiry_month', ''),
             'expiry_year': request.form.get('expiry_year', ''),
             'cvv': request.form.get('cvv', '')
         }
+        session.modified = True
+        flash('Payment information saved successfully!', 'success')
         return redirect(url_for('checkout_confirmation'))
     
     # Calculate total
@@ -265,7 +290,7 @@ def checkout_payment():
         if product:
             total += float(product.price) * quantity
     
-    return render_template('checkout/payment.html', total=total)
+    return render_template('checkout/payment.html', total=total)</old_str>
 
 @app.route('/checkout/confirmation', methods=['GET', 'POST'])
 @login_required
@@ -424,6 +449,13 @@ def terms():
     """Terms of service page"""
     return render_template('footer/terms.html')
 
+@app.template_filter('nl2br')
+def nl2br_filter(text):
+    """Convert newlines to HTML line breaks"""
+    if text:
+        return text.replace('\n', '<br>')
+    return text
+
 @app.context_processor
 def inject_cart_count():
     """Inject cart item count into all templates"""
@@ -435,4 +467,4 @@ def inject_cart_count():
     if current_user.is_authenticated:
         wishlist_count = Wishlist.query.filter_by(user_id=current_user.id).count()
     
-    return {'cart_count': total_items, 'wishlist_count': wishlist_count}
+    return {'cart_count': total_items, 'wishlist_count': wishlist_count}</old_str>
