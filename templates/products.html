@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar Filters -->
+    <div class="col-lg-3 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h5>
+            </div>
+            <div class="card-body">
+                <!-- Category Filter -->
+                <h6>Categories</h6>
+                <div class="list-group list-group-flush mb-3">
+                    <a href="{{ url_for('products') }}" 
+                       class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+                        All Categories
+                    </a>
+                    {% for category in categories %}
+                    <a href="{{ url_for('products', category=category.id, search=search_query) }}" 
+                       class="list-group-item list-group-item-action {% if current_category == category.id %}active{% endif %}">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                
+                <!-- Search Filter -->
+                <h6>Search</h6>
+                <form method="GET" action="{{ url_for('products') }}">
+                    {% if current_category %}
+                    <input type="hidden" name="category" value="{{ current_category }}">
+                    {% endif %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" 
+                               placeholder="Search products..." value="{{ search_query }}">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="col-lg-9">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>
+                    {% if current_category %}
+                        {% for category in categories %}
+                            {% if category.id == current_category %}{{ category.name }}{% endif %}
+                        {% endfor %}
+                    {% elif search_query %}
+                        Search Results for "{{ search_query }}"
+                    {% else %}
+                        All Products
+                    {% endif %}
+                </h2>
+                <p class="text-muted">{{ products|length }} product(s) found</p>
+            </div>
+        </div>
+
+        <!-- Products -->
+        {% if products %}
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card product-card h-100">
+                    <div class="product-image-container">
+                        <img src="{{ product.image_url }}" class="card-img-top product-image" alt="{{ product.name }}">
+                        <div class="product-overlay">
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-light btn-sm">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                        </div>
+                        {% if product.featured %}
+                        <span class="badge bg-warning position-absolute top-0 start-0 m-2">Featured</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted flex-grow-1">{{ product.description[:120] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <span class="h5 text-primary mb-0">${{ "%.2f"|format(product.price) }}</span>
+                            <div>
+                                {% if product.stock_quantity > 0 %}
+                                <form method="POST" action="{{ url_for('add_to_cart') }}" class="d-inline">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-shopping-cart me-1"></i>Add to Cart
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="badge bg-secondary">Out of Stock</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- No Products Found -->
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-4x text-muted mb-3"></i>
+            <h4>No products found</h4>
+            <p class="text-muted">Try adjusting your search criteria or browse different categories.</p>
+            <a href="{{ url_for('products') }}" class="btn btn-primary">View All Products</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
