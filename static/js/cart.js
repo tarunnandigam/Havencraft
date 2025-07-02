@@ -1,3 +1,138 @@
+// Cart functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle add to cart forms
+    const addToCartForms = document.querySelectorAll('.add-to-cart-form');
+
+    addToCartForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const productId = formData.get('product_id');
+            const quantity = formData.get('quantity') || 1;
+
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            submitBtn.disabled = true;
+
+            // Submit form
+            fetch('/add_to_cart', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    // Handle redirect response
+                    window.location.href = response.url;
+                } else {
+                    return response.text();
+                }
+            })
+            .then(data => {
+                if (data) {
+                    // Parse response if it's HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const alerts = doc.querySelectorAll('.alert');
+
+                    // Show alerts if any
+                    if (alerts.length > 0) {
+                        alerts.forEach(alert => {
+                            document.body.insertAdjacentHTML('afterbegin', alert.outerHTML);
+                        });
+                    }
+
+                    // Update cart count in navbar
+                    updateCartCount();
+
+                    // Show success message
+                    showToast('Product added to cart!', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error adding product to cart', 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    });
+
+    // Handle quantity updates in cart
+    const quantityInputs = document.querySelectorAll('input[name^="quantity_"]');
+    quantityInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+        });
+    });
+
+    // Handle remove from cart buttons
+    const removeButtons = document.querySelectorAll('.remove-from-cart');
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (confirm('Are you sure you want to remove this item from your cart?')) {
+                window.location.href = this.href;
+            }
+        });
+    });
+});
+
+// Update cart count in navbar
+function updateCartCount() {
+    fetch('/api/cart')
+        .then(response => response.json())
+        .then(cart => {
+            const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+            const cartBadge = document.querySelector('.nav-link .badge');
+            const cartCountSpan = document.querySelector('.position-absolute.badge');
+
+            if (cartBadge) {
+                cartBadge.textContent = cartCount;
+                cartBadge.style.display = cartCount > 0 ? 'inline' : 'none';
+            }
+
+            if (cartCountSpan) {
+                cartCountSpan.textContent = cartCount;
+                cartCountSpan.style.display = cartCount > 0 ? 'inline' : 'none';
+            }
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+}
+
+// Show toast notifications
+function showToast(message, type = 'info') {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    // Add to page
+    document.body.appendChild(toast);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 3000);
+}
+
+// Initialize cart count on page load
+document.addEventListener('DOMContentLoaded', updateCartCount);
+
 // Cart functionality for Artisan Marketplace
 class Cart {
     constructor() {

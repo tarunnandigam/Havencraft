@@ -9,7 +9,7 @@
             <div class="main-image mb-3">
                 <img src="{{ product.image_url }}" class="img-fluid rounded shadow" alt="{{ product.name }}" id="mainImage">
             </div>
-            
+
             <!-- Thumbnail Images -->
             {% set additional_images = product.get_additional_images() %}
             {% if additional_images %}
@@ -44,7 +44,7 @@
             </nav>
 
             <h1 class="h2 mb-3">{{ product.name }}</h1>
-            
+
             <div class="price-section mb-4">
                 <span class="h3 text-primary">${{ "%.2f"|format(product.price) }}</span>
                 {% if product.stock_quantity <= 3 and product.stock_quantity > 0 %}
@@ -180,7 +180,7 @@
 <script>
 function changeMainImage(imageSrc) {
     document.getElementById('mainImage').src = imageSrc;
-    
+
     // Update active thumbnail
     document.querySelectorAll('.gallery-thumbnail').forEach(thumb => {
         thumb.classList.remove('active');

@@ -229,7 +229,6 @@ def checkout_shipping():
             'phone': request.form.get('phone', '')
         }
         session.modified = True
-        flash('Shipping information saved successfully!', 'success')
         return redirect(url_for('checkout_payment'))
     
     # Pre-fill with user information if available
@@ -238,7 +237,9 @@ def checkout_shipping():
         'phone': getattr(current_user, 'phone', '') or ''
     }
     
-    return render_template('checkout/shipping.html', user_info=user_info)</old_str>
+    return render_template('checkout/shipping.html', user_info=user_info)
+
+@app.route('/checkout/payment', methods=['GET', 'POST'])</old_str>
 
 @app.route('/checkout/payment', methods=['GET', 'POST'])
 @login_required
@@ -280,7 +281,6 @@ def checkout_payment():
             'cvv': request.form.get('cvv', '')
         }
         session.modified = True
-        flash('Payment information saved successfully!', 'success')
         return redirect(url_for('checkout_confirmation'))
     
     # Calculate total

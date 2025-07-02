@@ -23,7 +23,7 @@
                     </a>
                     {% endfor %}
                 </div>
-                
+
                 <!-- Search Filter -->
                 <h6>Search</h6>
                 <form method="GET" action="{{ url_for('products') }}">
@@ -86,8 +86,9 @@
                             <span class="h5 text-primary mb-0">${{ "%.2f"|format(product.price) }}</span>
                             <div>
                                 {% if product.stock_quantity > 0 %}
-                                <form method="POST" action="{{ url_for('add_to_cart') }}" class="d-inline">
+                                <form method="POST" action="{{ url_for('add_to_cart') }}" class="add-to-cart-form d-inline">
                                     <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="hidden" name="quantity" value="1">
                                     <button type="submit" class="btn btn-primary btn-sm">
                                         <i class="fas fa-shopping-cart me-1"></i>Add to Cart
                                     </button>

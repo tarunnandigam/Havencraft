@@ -83,10 +83,18 @@
                     {% endif %}
 
                     <!-- Wishlist -->
-                    <a href="#" class="nav-link me-3" title="Wishlist">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('wishlist') }}" class="nav-link me-3" title="Wishlist">
                         <i class="fas fa-heart"></i>
-                        <span class="badge bg-danger rounded-pill">0</span>
+                        {% if wishlist_count > 0 %}
+                        <span class="badge bg-danger rounded-pill">{{ wishlist_count }}</span>
+                        {% endif %}
                     </a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link me-3" title="Wishlist">
+                        <i class="fas fa-heart"></i>
+                    </a>
+                    {% endif %}
 
                     <!-- Cart -->
                     <a href="{{ url_for('cart') }}" class="nav-link position-relative" title="Shopping Cart">
