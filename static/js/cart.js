@@ -7,14 +7,30 @@ class Cart {
         this.bindEvents();
     }
 
-    // Load cart from sessionStorage
+    // Load cart from sessionStorage and sync with server
     loadCart() {
         try {
+            // Load from sessionStorage as fallback
             const cart = sessionStorage.getItem('cart');
             return cart ? JSON.parse(cart) : {};
         } catch (error) {
             console.error('Error loading cart:', error);
             return {};
+        }
+    }
+
+    // Sync cart with server
+    async syncWithServer() {
+        try {
+            const response = await fetch('/api/cart');
+            if (response.ok) {
+                const serverCart = await response.json();
+                this.items = serverCart;
+                this.saveCart();
+                this.updateCartUI();
+            }
+        } catch (error) {
+            console.error('Error syncing cart with server:', error);
         }
     }
 
@@ -28,24 +44,55 @@ class Cart {
     }
 
     // Add item to cart
-    addItem(productId, quantity = 1) {
-        if (this.items[productId]) {
-            this.items[productId] += quantity;
-        } else {
-            this.items[productId] = quantity;
+    async addItem(productId, quantity = 1) {
+        try {
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('quantity', quantity);
+            
+            const response = await fetch('/add_to_cart', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                // Update local cart after successful server update
+                if (this.items[productId]) {
+                    this.items[productId] += quantity;
+                } else {
+                    this.items[productId] = quantity;
+                }
+                this.saveCart();
+                this.updateCartUI();
+                this.showCartNotification('Item added to cart!', 'success');
+            } else {
+                this.showCartNotification('Failed to add item to cart', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding item to cart:', error);
+            this.showCartNotification('Failed to add item to cart', 'error');
         }
-        this.saveCart();
-        this.updateCartUI();
-        this.showCartNotification('Item added to cart!', 'success');
     }
 
     // Remove item from cart
-    removeItem(productId) {
-        if (this.items[productId]) {
-            delete this.items[productId];
-            this.saveCart();
-            this.updateCartUI();
-            this.showCartNotification('Item removed from cart', 'warning');
+    async removeItem(productId) {
+        try {
+            const response = await fetch(`/remove_from_cart/${productId}`);
+            
+            if (response.ok) {
+                // Update local cart after successful server update
+                if (this.items[productId]) {
+                    delete this.items[productId];
+                    this.saveCart();
+                    this.updateCartUI();
+                    this.showCartNotification('Item removed from cart', 'warning');
+                }
+            } else {
+                this.showCartNotification('Failed to remove item from cart', 'error');
+            }
+        } catch (error) {
+            console.error('Error removing item from cart:', error);
+            this.showCartNotification('Failed to remove item from cart', 'error');
         }
     }
 
@@ -199,8 +246,9 @@ style.textContent = cartAnimationCSS;
 document.head.appendChild(style);
 
 // Initialize cart when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     window.cart = new Cart();
+    await window.cart.syncWithServer();
 });
 
 // Quantity control functions for cart page
@@ -221,23 +269,30 @@ function decreaseQuantity(productId) {
 }
 
 // Enhanced cart functionality for product pages
-function addToCartWithAnimation(productId, quantity = 1) {
+async function addToCartWithAnimation(productId, quantity = 1) {
     if (window.cart) {
-        window.cart.addItem(productId, quantity);
-        
         // Add visual feedback
         const button = event.target;
         const originalText = button.innerHTML;
         
-        button.innerHTML = '<i class="fas fa-check me-1"></i>Added!';
-        button.classList.add('btn-success');
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Adding...';
         button.disabled = true;
         
-        setTimeout(() => {
+        try {
+            await window.cart.addItem(productId, quantity);
+            
+            button.innerHTML = '<i class="fas fa-check me-1"></i>Added!';
+            button.classList.add('btn-success');
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+                button.disabled = false;
+            }, 1500);
+        } catch (error) {
             button.innerHTML = originalText;
-            button.classList.remove('btn-success');
             button.disabled = false;
-        }, 1500);
+        }
     }
 }
 

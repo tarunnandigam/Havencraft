@@ -362,6 +362,12 @@ def order_history():
     orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
     return render_template('orders.html', orders=orders)
 
+@app.route('/api/cart')
+def get_cart():
+    """API endpoint to get current cart state"""
+    cart = session.get('cart', {})
+    return jsonify(cart)
+
 @app.context_processor
 def inject_cart_count():
     """Inject cart item count into all templates"""
