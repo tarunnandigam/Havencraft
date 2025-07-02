@@ -388,6 +388,42 @@ def get_cart():
     cart = session.get('cart', {})
     return jsonify(cart)
 
+# Footer Pages
+@app.route('/about')
+def about():
+    """About us page"""
+    return render_template('footer/about.html')
+
+@app.route('/contact')
+def contact():
+    """Contact us page"""
+    return render_template('footer/contact.html')
+
+@app.route('/faq')
+def faq():
+    """FAQ page"""
+    return render_template('footer/faq.html')
+
+@app.route('/shipping')
+def shipping_info():
+    """Shipping information page"""
+    return render_template('footer/shipping.html')
+
+@app.route('/returns')
+def returns():
+    """Returns policy page"""
+    return render_template('footer/returns.html')
+
+@app.route('/privacy')
+def privacy():
+    """Privacy policy page"""
+    return render_template('footer/privacy.html')
+
+@app.route('/terms')
+def terms():
+    """Terms of service page"""
+    return render_template('footer/terms.html')
+
 @app.context_processor
 def inject_cart_count():
     """Inject cart item count into all templates"""

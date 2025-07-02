@@ -167,7 +167,7 @@ class Cart {
     bindEvents() {
         // Add to cart form submissions
         document.addEventListener('submit', (e) => {
-            if (e.target.classList.contains('add-to-cart-form') || e.target.action?.includes('add_to_cart')) {
+            if (e.target.action && e.target.action.includes('add_to_cart')) {
                 e.preventDefault();
                 const formData = new FormData(e.target);
                 const productId = formData.get('product_id');
@@ -179,15 +179,17 @@ class Cart {
             }
         });
 
-        // Add to cart buttons with data attributes
+        // Handle button clicks for add to cart
         document.addEventListener('click', (e) => {
-            if (e.target.matches('.add-to-cart, .add-to-cart *')) {
-                const button = e.target.closest('.add-to-cart') || e.target;
-                const productId = button.dataset.productId;
-                const quantity = parseInt(button.dataset.quantity || 1);
+            const button = e.target.closest('button[type="submit"]');
+            if (button && button.closest('form[action*="add_to_cart"]')) {
+                e.preventDefault();
+                const form = button.closest('form');
+                const formData = new FormData(form);
+                const productId = formData.get('product_id');
+                const quantity = parseInt(formData.get('quantity') || 1);
 
                 if (productId) {
-                    e.preventDefault();
                     this.addItem(productId, quantity);
                 }
             }
@@ -225,6 +227,11 @@ class Cart {
         });
     }
 }
+
+// Initialize cart when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    window.cart = new Cart();
+});
 
 // Cart animation CSS
 const cartAnimationCSS = `
