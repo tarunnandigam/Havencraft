@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <div class="success-icon mb-4">
+                    <i class="fas fa-check-circle text-success"></i>
+                </div>
+                <h1 class="h2 mb-3">Order Confirmed!</h1>
+                <p class="lead text-muted">Thank you for your purchase. Your order has been successfully placed.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Order Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Order Information</h6>
+                            <p class="mb-1"><strong>Order #:</strong> {{ order.id }}</p>
+                            <p class="mb-1"><strong>Date:</strong> {{ order.created_at.strftime('%B %d, %Y') }}</p>
+                            <p class="mb-1"><strong>Status:</strong> 
+                                <span class="badge bg-success">{{ order.status.title() }}</span>
+                            </p>
+                            <p class="mb-1"><strong>Total:</strong> ${{ "%.2f"|format(order.total_amount) }}</p>
+                            <p class="mb-1"><strong>Payment:</strong> {{ order.payment_method.replace('_', ' ').title() }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Shipping Address</h6>
+                            <address class="mb-0">
+                                {{ order.shipping_address|replace('\n', '<br>')|safe }}
+                            </address>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Items</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in order.items %}
+                    <div class="d-flex align-items-center py-3">
+                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" 
+                             class="order-item-image me-3">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ item.product.name }}</h6>
+                            <small class="text-muted">{{ item.product.category.name }}</small>
+                        </div>
+                        <div class="text-center mx-3">
+                            <small class="text-muted">Qty</small>
+                            <div>{{ item.quantity }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold">${{ "%.2f"|format(item.price * item.quantity) }}</div>
+                            <small class="text-muted">${{ "%.2f"|format(item.price) }} each</small>
+                        </div>
+                    </div>
+                    {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">What's Next?</h6>
+                            <div class="timeline">
+                                <div class="timeline-item active">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6>Order Confirmed</h6>
+                                        <small>Your order has been received</small>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6>Processing</h6>
+                                        <small>Artisans prepare your items</small>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6>Shipped</h6>
+                                        <small>Items on their way to you</small>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <h6>Delivered</h6>
+                                        <small>Enjoy your handmade treasures</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Order Summary</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal</span>
+                                <span>${{ "%.2f"|format(order.total_amount / 1.08) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping</span>
+                                <span>FREE</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax</span>
+                                <span>${{ "%.2f"|format(order.total_amount - (order.total_amount / 1.08)) }}</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Total</span>
+                                <span>${{ "%.2f"|format(order.total_amount) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('orders') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-1"></i>View All Orders
+                    </a>
+                    <a href="{{ url_for('products') }}" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag me-1"></i>Continue Shopping
+                    </a>
+                </div>
+                <div class="mt-3">
+                    <p class="text-muted">
+                        <i class="fas fa-envelope me-1"></i>
+                        A confirmation email has been sent to your email address.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.success-icon i {
+    font-size: 4rem;
+}
+
+.order-item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.timeline {
+    text-align: left;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-marker {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #e9ecef;
+    margin-right: 15px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.timeline-item.active .timeline-marker {
+    background: #198754;
+}
+
+.timeline-item:not(:last-child) .timeline-marker::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 30px;
+    background: #e9ecef;
+}
+
+.timeline-content h6 {
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+}
+
+.timeline-content small {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Information - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Checkout Progress -->
+            <div class="checkout-progress mb-4">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="step completed">
+                            <div class="step-number">✓</div>
+                            <div class="step-label">Review</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="step completed">
+                            <div class="step-number">✓</div>
+                            <div class="step-label">Shipping</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="step active">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Payment</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Confirm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Payment Information</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="payment-form">
+                        <!-- Payment Method Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">Payment Method</label>
+                            <div class="payment-methods">
+                                <div class="payment-method active" data-method="credit_card">
+                                    <input type="radio" name="payment_method" value="credit_card" checked>
+                                    <div class="method-content">
+                                        <i class="fab fa-cc-visa me-2"></i>
+                                        <i class="fab fa-cc-mastercard me-2"></i>
+                                        <i class="fab fa-cc-amex me-2"></i>
+                                        <span>Credit/Debit Card</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-method" data-method="paypal">
+                                    <input type="radio" name="payment_method" value="paypal">
+                                    <div class="method-content">
+                                        <i class="fab fa-paypal me-2"></i>
+                                        <span>PayPal</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-method" data-method="apple_pay">
+                                    <input type="radio" name="payment_method" value="apple_pay">
+                                    <div class="method-content">
+                                        <i class="fab fa-apple-pay me-2"></i>
+                                        <span>Apple Pay</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Credit Card Form -->
+                        <div id="credit-card-form">
+                            <div class="mb-3">
+                                <label for="card_name" class="form-label">Cardholder Name *</label>
+                                <input type="text" class="form-control" id="card_name" name="card_name" 
+                                       placeholder="John Doe" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="card_number" class="form-label">Card Number *</label>
+                                <input type="text" class="form-control" id="card_number" name="card_number" 
+                                       placeholder="1234 5678 9012 3456" maxlength="19" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="expiry" class="form-label">Expiry Date *</label>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <select class="form-select" name="expiry_month" required>
+                                                <option value="">MM</option>
+                                                {% for month in range(1, 13) %}
+                                                <option value="{{ '%02d'|format(month) }}">{{ '%02d'|format(month) }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <select class="form-select" name="expiry_year" required>
+                                                <option value="">YYYY</option>
+                                                {% for year in range(2024, 2035) %}
+                                                <option value="{{ year }}">{{ year }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cvv" class="form-label">CVV *</label>
+                                    <input type="text" class="form-control" id="cvv" name="cvv" 
+                                           placeholder="123" maxlength="4" required>
+                                    <div class="form-text">3-4 digits on the back of your card</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alternative Payment Methods -->
+                        <div id="paypal-form" style="display: none;">
+                            <div class="text-center py-4">
+                                <p class="mb-3">You will be redirected to PayPal to complete your payment</p>
+                                <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-200px.png" 
+                                     alt="PayPal" style="height: 50px;">
+                            </div>
+                        </div>
+
+                        <div id="apple-pay-form" style="display: none;">
+                            <div class="text-center py-4">
+                                <p class="mb-3">Use Touch ID or Face ID to pay with Apple Pay</p>
+                                <div class="apple-pay-button" style="height: 50px; background: #000; color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fab fa-apple-pay me-2"></i>Pay with Apple Pay
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('checkout_shipping') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Review Order <i class="fas fa-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Total</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>${{ "%.2f"|format(total) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span>FREE</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax</span>
+                        <span>${{ "%.2f"|format(total * 0.08) }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total</span>
+                        <span>${{ "%.2f"|format(total * 1.08) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">Secure Payment</h6>
+                    <div class="security-badges">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-shield-alt text-success me-2"></i>
+                            <small>256-bit SSL encryption</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-lock text-success me-2"></i>
+                            <small>PCI DSS compliant</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-credit-card text-success me-2"></i>
+                            <small>100% secure checkout</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Payment method selection
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    const creditCardForm = document.getElementById('credit-card-form');
+    const paypalForm = document.getElementById('paypal-form');
+    const applePayForm = document.getElementById('apple-pay-form');
+    
+    paymentMethods.forEach(method => {
+        method.addEventListener('click', function() {
+            // Remove active class from all methods
+            paymentMethods.forEach(m => m.classList.remove('active'));
+            // Add active class to clicked method
+            this.classList.add('active');
+            // Check the radio button
+            this.querySelector('input[type="radio"]').checked = true;
+            
+            // Show/hide forms based on selection
+            const selectedMethod = this.dataset.method;
+            creditCardForm.style.display = selectedMethod === 'credit_card' ? 'block' : 'none';
+            paypalForm.style.display = selectedMethod === 'paypal' ? 'block' : 'none';
+            applePayForm.style.display = selectedMethod === 'apple_pay' ? 'block' : 'none';
+        });
+    });
+    
+    // Format card number
+    const cardNumberInput = document.getElementById('card_number');
+    cardNumberInput.addEventListener('input', function() {
+        let value = this.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+        let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+        this.value = formattedValue;
+    });
+});
+</script>
+
+<style>
+.checkout-progress .step {
+    position: relative;
+}
+
+.checkout-progress .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: bold;
+}
+
+.checkout-progress .step.active .step-number {
+    background: #0d6efd;
+    color: white;
+}
+
+.checkout-progress .step.completed .step-number {
+    background: #198754;
+    color: white;
+}
+
+.checkout-progress .step-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.checkout-progress .step.active .step-label,
+.checkout-progress .step.completed .step-label {
+    color: #0d6efd;
+}
+
+.payment-method {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.payment-method.active {
+    border-color: #0d6efd;
+    background-color: #f8f9ff;
+}
+
+.payment-method input[type="radio"] {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.method-content {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.apple-pay-button:hover {
+    background-color: #333 !important;
+    cursor: pointer;
+}
+</style>
+{% endblock %}

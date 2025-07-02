@@ -1,0 +1,44 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#A0522D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="highlight" cx="30%" cy="20%" r="40%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
+    </radialGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bgGrad)"/>
+  
+  <!-- Shadow -->
+  <ellipse cx="200" cy="380" rx="80" ry="15" fill="#00000025"/>
+  
+  <!-- Vase Body -->
+  <path d="M 140 100 Q 120 150 130 200 Q 135 250 140 300 Q 145 350 150 370 L 250 370 Q 255 350 260 300 Q 265 250 270 200 Q 280 150 260 100 Z" fill="url(#vaseGrad)"/>
+  
+  <!-- Vase Neck -->
+  <rect x="180" y="80" width="40" height="30" fill="url(#vaseGrad)"/>
+  
+  <!-- Rim -->
+  <ellipse cx="200" cy="85" rx="25" ry="8" fill="url(#vaseGrad)"/>
+  <ellipse cx="200" cy="82" rx="25" ry="8" fill="#A0522D"/>
+  
+  <!-- Decorative Pattern -->
+  <path d="M 150 150 Q 200 140 250 150" stroke="#654321" stroke-width="3" fill="none"/>
+  <path d="M 150 180 Q 200 170 250 180" stroke="#654321" stroke-width="3" fill="none"/>
+  <path d="M 150 210 Q 200 200 250 210" stroke="#654321" stroke-width="3" fill="none"/>
+  
+  <!-- Highlight -->
+  <ellipse cx="170" cy="150" rx="30" ry="80" fill="url(#highlight)"/>
+  
+  <!-- Base -->
+  <ellipse cx="200" cy="370" rx="55" ry="12" fill="#654321"/>
+</svg>

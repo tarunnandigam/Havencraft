@@ -49,6 +49,49 @@ class User(UserMixin, db.Model):
     def get_full_name(self):
         return f"{self.first_name or ''} {self.last_name or ''}".strip() or self.username
 
+# Wishlist model for user favorites
+class Wishlist(db.Model):
+    __tablename__ = 'wishlists'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('wishlist_items', lazy=True))
+    product = db.relationship('Product', backref=db.backref('wishlisted_by', lazy=True))
+    
+    # Unique constraint to prevent duplicate wishlist entries
+    __table_args__ = (db.UniqueConstraint('user_id', 'product_id', name='unique_user_product_wishlist'),)
+
+# Order model for purchase tracking
+class Order(db.Model):
+    __tablename__ = 'orders'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    total_amount = db.Column(db.Numeric(10, 2), nullable=False)
+    status = db.Column(db.String(50), default='pending')  # pending, confirmed, shipped, delivered, cancelled
+    shipping_address = db.Column(db.Text, nullable=False)
+    payment_method = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('orders', lazy=True))
+
+# Order items for detailed order tracking
+class OrderItem(db.Model):
+    __tablename__ = 'order_items'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)  # Price at time of order
+    
+    # Relationships
+    order = db.relationship('Order', backref=db.backref('items', lazy=True))
+    product = db.relationship('Product', backref=db.backref('order_items', lazy=True))
+
 def init_sample_data():
     """Initialize the database with sample handmade products"""
     import json

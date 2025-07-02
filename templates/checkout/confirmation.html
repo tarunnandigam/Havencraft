@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Order - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Checkout Progress -->
+            <div class="checkout-progress mb-4">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="step completed">
+                            <div class="step-number">✓</div>
+                            <div class="step-label">Review</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="step completed">
+                            <div class="step-number">✓</div>
+                            <div class="step-label">Shipping</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="step completed">
+                            <div class="step-number">✓</div>
+                            <div class="step-label">Payment</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="step active">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Confirm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Review Your Order</h4>
+                </div>
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="cart-item d-flex align-items-center py-3">
+                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="cart-item-image me-3">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ item.product.name }}</h6>
+                            <small class="text-muted">{{ item.product.category.name }}</small>
+                        </div>
+                        <div class="text-center mx-3">
+                            <small class="text-muted">Qty</small>
+                            <div>{{ item.quantity }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold">${{ "%.2f"|format(item.subtotal) }}</div>
+                        </div>
+                    </div>
+                    {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Shipping Address</h5>
+                        </div>
+                        <div class="card-body">
+                            <address class="mb-0">
+                                <strong>{{ shipping_info.full_name }}</strong><br>
+                                {{ shipping_info.address_line1 }}<br>
+                                {% if shipping_info.address_line2 %}
+                                {{ shipping_info.address_line2 }}<br>
+                                {% endif %}
+                                {{ shipping_info.city }}, {{ shipping_info.state }} {{ shipping_info.postal_code }}<br>
+                                {{ shipping_info.country }}
+                                {% if shipping_info.phone %}
+                                <br><br>
+                                <i class="fas fa-phone me-1"></i>{{ shipping_info.phone }}
+                                {% endif %}
+                            </address>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Payment Method</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if payment_info.payment_method == 'credit_card' %}
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-credit-card me-2"></i>
+                                <div>
+                                    <div>Credit/Debit Card</div>
+                                    <small class="text-muted">
+                                        **** **** **** {{ payment_info.card_number[-4:] if payment_info.card_number else '****' }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% elif payment_info.payment_method == 'paypal' %}
+                            <div class="d-flex align-items-center">
+                                <i class="fab fa-paypal me-2"></i>
+                                <span>PayPal</span>
+                            </div>
+                            {% elif payment_info.payment_method == 'apple_pay' %}
+                            <div class="d-flex align-items-center">
+                                <i class="fab fa-apple-pay me-2"></i>
+                                <span>Apple Pay</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" class="mt-4">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('checkout_payment') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Payment
+                    </a>
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-check me-1"></i>Place Order
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>${{ "%.2f"|format(total) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span>FREE</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax</span>
+                        <span>${{ "%.2f"|format(total * 0.08) }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold h5">
+                        <span>Total</span>
+                        <span>${{ "%.2f"|format(total * 1.08) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Order Guarantee</h6>
+                    <div class="guarantee-items">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-undo text-success me-2"></i>
+                            <small>30-day return policy</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-shield-alt text-success me-2"></i>
+                            <small>Quality guarantee</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-headset text-success me-2"></i>
+                            <small>24/7 customer support</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.checkout-progress .step {
+    position: relative;
+}
+
+.checkout-progress .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: bold;
+}
+
+.checkout-progress .step.active .step-number {
+    background: #0d6efd;
+    color: white;
+}
+
+.checkout-progress .step.completed .step-number {
+    background: #198754;
+    color: white;
+}
+
+.checkout-progress .step-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.checkout-progress .step.active .step-label,
+.checkout-progress .step.completed .step-label {
+    color: #0d6efd;
+}
+
+.cart-item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

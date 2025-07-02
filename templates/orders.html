@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Order History - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-3 col-md-4">
+            <!-- Profile Sidebar -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="profile-avatar mb-3">
+                        <i class="fas fa-user-circle fa-5x text-muted"></i>
+                    </div>
+                    <h5 class="card-title">{{ current_user.get_full_name() or current_user.username }}</h5>
+                    <p class="text-muted">{{ current_user.email }}</p>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">Account</h6>
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                        <a href="{{ url_for('order_history') }}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-shopping-bag me-2"></i>Order History
+                        </a>
+                        <a href="{{ url_for('wishlist') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-heart me-2"></i>Wishlist
+                        </a>
+                        <a href="{{ url_for('edit_profile') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-edit me-2"></i>Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9 col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">Order History</h1>
+                <span class="text-muted">{{ orders|length }} order{{ 's' if orders|length != 1 else '' }}</span>
+            </div>
+            
+            {% if orders %}
+            <div class="orders-list">
+                {% for order in orders %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <h6 class="mb-0">Order #{{ order.id }}</h6>
+                                <small class="text-muted">{{ order.created_at.strftime('%B %d, %Y') }}</small>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="badge bg-{{ 'success' if order.status == 'confirmed' else 'primary' if order.status == 'shipped' else 'secondary' }}">
+                                    {{ order.status.title() }}
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>${{ "%.2f"|format(order.total_amount) }}</strong>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <button class="btn btn-outline-primary btn-sm" onclick="toggleOrderDetails({{ order.id }})">
+                                    <i class="fas fa-chevron-down me-1"></i>Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-details" id="order-{{ order.id }}" style="display: none;">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Shipping Address</h6>
+                                    <address class="mb-3">
+                                        {{ order.shipping_address|replace('\n', '<br>')|safe }}
+                                    </address>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Payment Method</h6>
+                                    <p>{{ order.payment_method.replace('_', ' ').title() }}</p>
+                                </div>
+                            </div>
+                            
+                            <h6>Order Items</h6>
+                            <div class="order-items">
+                                {% for item in order.items %}
+                                <div class="d-flex align-items-center py-2">
+                                    <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" 
+                                         class="order-item-image me-3">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ item.product.name }}</h6>
+                                        <small class="text-muted">{{ item.product.category.name }}</small>
+                                    </div>
+                                    <div class="text-center mx-3">
+                                        <small class="text-muted">Qty</small>
+                                        <div>{{ item.quantity }}</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">${{ "%.2f"|format(item.price * item.quantity) }}</div>
+                                        <small class="text-muted">${{ "%.2f"|format(item.price) }} each</small>
+                                    </div>
+                                </div>
+                                {% if not loop.last %}<hr class="my-2">{% endif %}
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <a href="{{ url_for('product_detail', product_id=order.items[0].product.id) if order.items else '#' }}" 
+                                           class="btn btn-outline-primary">
+                                            <i class="fas fa-redo me-1"></i>Reorder Items
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <div class="order-total">
+                                            <strong>Total: ${{ "%.2f"|format(order.total_amount) }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-shopping-bag fa-4x text-muted"></i>
+                </div>
+                <h3 class="h4 mb-3">No orders yet</h3>
+                <p class="text-muted mb-4">You haven't placed any orders yet. Start exploring our handmade collection!</p>
+                <a href="{{ url_for('products') }}" class="btn btn-primary">
+                    <i class="fas fa-shopping-bag me-1"></i>Browse Products
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleOrderDetails(orderId) {
+    const details = document.getElementById(`order-${orderId}`);
+    const button = event.target.closest('button');
+    const icon = button.querySelector('i');
+    
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        details.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+</script>
+
+<style>
+.order-item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.order-details {
+    border-top: 1px solid #e9ecef;
+}
+
+.orders-list .card {
+    transition: box-shadow 0.3s ease;
+}
+
+.orders-list .card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}
