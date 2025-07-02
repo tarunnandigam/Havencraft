@@ -41,7 +41,7 @@
                     <h4 class="mb-0">Payment Information</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" class="needs-validation" novalidate>
+                    <form method="POST" action="{{ url_for('checkout_payment') }}" class="needs-validation" novalidate>
                         <div class="mb-4">
                             <h5>Order Total: ${{ "%.2f"|format(total) }}</h5>
                         </div>

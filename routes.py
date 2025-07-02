@@ -212,23 +212,31 @@ def checkout_shipping():
     if request.method == 'POST':
         # Validate required fields
         required_fields = ['full_name', 'address_line1', 'city', 'state', 'postal_code', 'country']
+        missing_fields = []
+        
         for field in required_fields:
-            if not request.form.get(field):
-                flash(f'Please fill in the {field.replace("_", " ").title()} field', 'error')
-                return redirect(url_for('checkout_shipping'))
+            if not request.form.get(field, '').strip():
+                missing_fields.append(field.replace('_', ' ').title())
+        
+        if missing_fields:
+            flash(f'Please fill in the following fields: {", ".join(missing_fields)}', 'error')
+            return render_template('checkout/shipping.html', 
+                                 user_info=request.form.to_dict(),
+                                 errors=missing_fields)
 
         # Store shipping info in session
         session['shipping_info'] = {
-            'full_name': request.form['full_name'],
-            'address_line1': request.form['address_line1'],
-            'address_line2': request.form.get('address_line2', ''),
-            'city': request.form['city'],
-            'state': request.form['state'],
-            'postal_code': request.form['postal_code'],
-            'country': request.form['country'],
-            'phone': request.form.get('phone', '')
+            'full_name': request.form['full_name'].strip(),
+            'address_line1': request.form['address_line1'].strip(),
+            'address_line2': request.form.get('address_line2', '').strip(),
+            'city': request.form['city'].strip(),
+            'state': request.form['state'].strip(),
+            'postal_code': request.form['postal_code'].strip(),
+            'country': request.form['country'].strip(),
+            'phone': request.form.get('phone', '').strip()
         }
         session.modified = True
+        flash('Shipping information saved successfully!', 'success')
         return redirect(url_for('checkout_payment'))
 
     # Pre-fill with user information if available
@@ -259,26 +267,39 @@ def checkout_payment():
         payment_method = request.form.get('payment_method')
         if not payment_method:
             flash('Please select a payment method', 'error')
-            return redirect(url_for('checkout_payment'))
+            return render_template('checkout/payment.html', 
+                                 total=sum(float(Product.query.get(int(pid)).price) * qty 
+                                          for pid, qty in cart.items() if Product.query.get(int(pid))),
+                                 error='Please select a payment method')
 
         # Validate credit card info if credit card is selected
         if payment_method == 'credit_card':
             required_fields = ['card_name', 'card_number', 'expiry_month', 'expiry_year', 'cvv']
+            missing_fields = []
+            
             for field in required_fields:
-                if not request.form.get(field):
-                    flash(f'Please fill in the {field.replace("_", " ").title()} field', 'error')
-                    return redirect(url_for('checkout_payment'))
+                if not request.form.get(field, '').strip():
+                    missing_fields.append(field.replace('_', ' ').title())
+            
+            if missing_fields:
+                flash(f'Please fill in the following fields: {", ".join(missing_fields)}', 'error')
+                return render_template('checkout/payment.html', 
+                                     total=sum(float(Product.query.get(int(pid)).price) * qty 
+                                              for pid, qty in cart.items() if Product.query.get(int(pid))),
+                                     form_data=request.form.to_dict(),
+                                     errors=missing_fields)
 
         # Store payment info in session (in real app, process payment here)
         session['payment_info'] = {
             'payment_method': payment_method,
-            'card_name': request.form.get('card_name', ''),
-            'card_number': request.form.get('card_number', ''),
-            'expiry_month': request.form.get('expiry_month', ''),
-            'expiry_year': request.form.get('expiry_year', ''),
-            'cvv': request.form.get('cvv', '')
+            'card_name': request.form.get('card_name', '').strip(),
+            'card_number': request.form.get('card_number', '').strip(),
+            'expiry_month': request.form.get('expiry_month', '').strip(),
+            'expiry_year': request.form.get('expiry_year', '').strip(),
+            'cvv': request.form.get('cvv', '').strip()
         }
         session.modified = True
+        flash('Payment information saved successfully!', 'success')
         return redirect(url_for('checkout_confirmation'))
 
     # Calculate total
@@ -466,3 +487,15 @@ def inject_cart_count():
         wishlist_count = Wishlist.query.filter_by(user_id=current_user.id).count()
 
     return {'cart_count': total_items, 'wishlist_count': wishlist_count}
+
+@app.route('/debug/session')
+def debug_session():
+    """Debug route to check session data"""
+    if app.debug:
+        return jsonify({
+            'cart': session.get('cart', {}),
+            'shipping_info': session.get('shipping_info', {}),
+            'payment_info': session.get('payment_info', {}),
+            'user_authenticated': current_user.is_authenticated
+        })
+    return "Debug mode not enabled", 404

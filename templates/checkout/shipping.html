@@ -41,7 +41,7 @@
                     <h4 class="mb-0">Shipping Information</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" class="needs-validation" novalidate>
+                    <form method="POST" action="{{ url_for('checkout_shipping') }}" class="needs-validation" novalidate>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="full_name" class="form-label">Full Name *</label>

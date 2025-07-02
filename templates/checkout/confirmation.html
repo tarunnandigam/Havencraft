@@ -117,8 +117,8 @@
                 </div>
             </div>
 
-            <form method="POST" class="mt-4">
-                <div class="d-flex justify-content-between">
+            <form method="POST" action="{{ url_for('checkout_confirmation') }}">
+                <div class="d-flex justify-content-between mt-4">
                     <a href="{{ url_for('checkout_payment') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-1"></i>Back to Payment
                     </a>
