@@ -21,19 +21,19 @@ def products():
     """Products page with filtering and search"""
     category_id = request.args.get('category', type=int)
     search_query = request.args.get('search', '')
-    
+
     query = Product.query
-    
+
     if category_id:
         query = query.filter_by(category_id=category_id)
-    
+
     if search_query:
         query = query.filter(Product.name.contains(search_query) | 
                            Product.description.contains(search_query))
-    
+
     products = query.all()
     categories = Category.query.all()
-    
+
     return render_template('products.html', 
                          products=products, 
                          categories=categories,
@@ -48,7 +48,7 @@ def product_detail(product_id):
         Product.category_id == product.category_id,
         Product.id != product.id
     ).limit(3).all()
-    
+
     return render_template('product_detail.html', 
                          product=product, 
                          related_products=related_products)
@@ -59,7 +59,7 @@ def cart():
     cart_items = session.get('cart', {})
     cart_products = []
     total = 0
-    
+
     for product_id, quantity in cart_items.items():
         product = Product.query.get(int(product_id))
         if product:
@@ -70,7 +70,7 @@ def cart():
                 'subtotal': subtotal
             })
             total += subtotal
-    
+
     return render_template('cart.html', cart_products=cart_products, total=total)
 
 @app.route('/add_to_cart', methods=['POST'])
@@ -78,32 +78,32 @@ def add_to_cart():
     """Add product to cart"""
     product_id = request.form.get('product_id', type=int)
     quantity = request.form.get('quantity', 1, type=int)
-    
+
     if not product_id:
         flash('Invalid product', 'error')
         return redirect(request.referrer or url_for('index'))
-    
+
     product = Product.query.get(product_id)
     if not product:
         flash('Product not found', 'error')
         return redirect(request.referrer or url_for('index'))
-    
+
     # Initialize cart if it doesn't exist
     if 'cart' not in session:
         session['cart'] = {}
-    
+
     # Add or update item in cart
     cart = session['cart']
     product_id_str = str(product_id)
-    
+
     if product_id_str in cart:
         cart[product_id_str] += quantity
     else:
         cart[product_id_str] = quantity
-    
+
     session['cart'] = cart
     session.modified = True
-    
+
     flash(f'{product.name} added to cart!', 'success')
     return redirect(request.referrer or url_for('products'))
 
@@ -111,17 +111,17 @@ def add_to_cart():
 def update_cart():
     """Update cart quantities"""
     cart = session.get('cart', {})
-    
+
     for product_id in cart.keys():
         new_quantity = request.form.get(f'quantity_{product_id}', type=int)
         if new_quantity and new_quantity > 0:
             cart[product_id] = new_quantity
         elif new_quantity == 0:
             del cart[product_id]
-    
+
     session['cart'] = cart
     session.modified = True
-    
+
     flash('Cart updated successfully!', 'success')
     return redirect(url_for('cart'))
 
@@ -130,13 +130,13 @@ def remove_from_cart(product_id):
     """Remove item from cart"""
     cart = session.get('cart', {})
     product_id_str = str(product_id)
-    
+
     if product_id_str in cart:
         del cart[product_id_str]
         session['cart'] = cart
         session.modified = True
         flash('Item removed from cart', 'success')
-    
+
     return redirect(url_for('cart'))
 
 # Wishlist routes
@@ -153,7 +153,7 @@ def toggle_wishlist(product_id):
     """Add or remove product from wishlist"""
     product = Product.query.get_or_404(product_id)
     existing_item = Wishlist.query.filter_by(user_id=current_user.id, product_id=product_id).first()
-    
+
     if existing_item:
         # Remove from wishlist
         db.session.delete(existing_item)
@@ -167,11 +167,11 @@ def toggle_wishlist(product_id):
         db.session.commit()
         flash(f'{product.name} added to wishlist', 'success')
         action = 'added'
-    
+
     # Return JSON for AJAX requests
     if request.headers.get('Content-Type') == 'application/json':
         return jsonify({'status': 'success', 'action': action})
-    
+
     return redirect(request.referrer or url_for('products'))
 
 # Enhanced checkout process
@@ -182,10 +182,10 @@ def checkout():
     if not cart:
         flash('Your cart is empty', 'info')
         return redirect(url_for('products'))
-    
+
     cart_items = []
     total = 0
-    
+
     for product_id, quantity in cart.items():
         product = Product.query.get(int(product_id))
         if product:
@@ -196,7 +196,7 @@ def checkout():
                 'subtotal': subtotal
             })
             total += subtotal
-    
+
     return render_template('checkout/review.html', cart_items=cart_items, total=total)
 
 @app.route('/checkout/shipping', methods=['GET', 'POST'])
@@ -208,7 +208,7 @@ def checkout_shipping():
     if not cart:
         flash('Your cart is empty', 'info')
         return redirect(url_for('products'))
-    
+
     if request.method == 'POST':
         # Validate required fields
         required_fields = ['full_name', 'address_line1', 'city', 'state', 'postal_code', 'country']
@@ -216,7 +216,7 @@ def checkout_shipping():
             if not request.form.get(field):
                 flash(f'Please fill in the {field.replace("_", " ").title()} field', 'error')
                 return redirect(url_for('checkout_shipping'))
-        
+
         # Store shipping info in session
         session['shipping_info'] = {
             'full_name': request.form['full_name'],
@@ -230,16 +230,14 @@ def checkout_shipping():
         }
         session.modified = True
         return redirect(url_for('checkout_payment'))
-    
+
     # Pre-fill with user information if available
     user_info = {
         'full_name': (getattr(current_user, 'first_name', '') + ' ' + getattr(current_user, 'last_name', '')).strip() or current_user.username,
         'phone': getattr(current_user, 'phone', '') or ''
     }
-    
-    return render_template('checkout/shipping.html', user_info=user_info)
 
-@app.route('/checkout/payment', methods=['GET', 'POST'])</old_str>
+    return render_template('checkout/shipping.html', user_info=user_info)
 
 @app.route('/checkout/payment', methods=['GET', 'POST'])
 @login_required
@@ -250,19 +248,19 @@ def checkout_payment():
     if not cart:
         flash('Your cart is empty', 'info')
         return redirect(url_for('products'))
-    
+
     # Check if shipping info exists
     if 'shipping_info' not in session:
         flash('Please provide shipping information first', 'warning')
         return redirect(url_for('checkout_shipping'))
-    
+
     if request.method == 'POST':
         # Validate payment method
         payment_method = request.form.get('payment_method')
         if not payment_method:
             flash('Please select a payment method', 'error')
             return redirect(url_for('checkout_payment'))
-        
+
         # Validate credit card info if credit card is selected
         if payment_method == 'credit_card':
             required_fields = ['card_name', 'card_number', 'expiry_month', 'expiry_year', 'cvv']
@@ -270,7 +268,7 @@ def checkout_payment():
                 if not request.form.get(field):
                     flash(f'Please fill in the {field.replace("_", " ").title()} field', 'error')
                     return redirect(url_for('checkout_payment'))
-        
+
         # Store payment info in session (in real app, process payment here)
         session['payment_info'] = {
             'payment_method': payment_method,
@@ -282,15 +280,15 @@ def checkout_payment():
         }
         session.modified = True
         return redirect(url_for('checkout_confirmation'))
-    
+
     # Calculate total
     total = 0
     for product_id, quantity in cart.items():
         product = Product.query.get(int(product_id))
         if product:
             total += float(product.price) * quantity
-    
-    return render_template('checkout/payment.html', total=total)</old_str>
+
+    return render_template('checkout/payment.html', total=total)
 
 @app.route('/checkout/confirmation', methods=['GET', 'POST'])
 @login_required
@@ -301,23 +299,23 @@ def checkout_confirmation():
     if not cart:
         flash('Your cart is empty', 'error')
         return redirect(url_for('products'))
-    
+
     # Check if required session data exists
     if 'shipping_info' not in session:
         flash('Please provide shipping information first', 'warning')
         return redirect(url_for('checkout_shipping'))
-    
+
     if 'payment_info' not in session:
         flash('Please provide payment information first', 'warning')
         return redirect(url_for('checkout_payment'))
-    
+
     if request.method == 'POST':
         # Process the order
         try:
             # Calculate total
             total = 0
             cart_items = []
-            
+
             for product_id, quantity in cart.items():
                 product = Product.query.get(int(product_id))
                 if product:
@@ -328,14 +326,14 @@ def checkout_confirmation():
                         'price': float(product.price)
                     })
                     total += subtotal
-            
+
             # Create shipping address string
             shipping_info = session['shipping_info']
             shipping_address = f"{shipping_info['full_name']}\n{shipping_info['address_line1']}\n"
             if shipping_info['address_line2']:
                 shipping_address += f"{shipping_info['address_line2']}\n"
             shipping_address += f"{shipping_info['city']}, {shipping_info['state']} {shipping_info['postal_code']}\n{shipping_info['country']}"
-            
+
             # Create order
             order = Order(
                 user_id=current_user.id,
@@ -346,7 +344,7 @@ def checkout_confirmation():
             )
             db.session.add(order)
             db.session.flush()  # Get order ID
-            
+
             # Create order items
             for item in cart_items:
                 order_item = OrderItem(
@@ -356,26 +354,26 @@ def checkout_confirmation():
                     price=Decimal(str(item['price']))
                 )
                 db.session.add(order_item)
-            
+
             db.session.commit()
-            
+
             # Clear cart and session data
             session.pop('cart', None)
             session.pop('shipping_info', None)
             session.pop('payment_info', None)
-            
+
             # Redirect to success page
             return redirect(url_for('order_success', order_id=order.id))
-            
+
         except Exception as e:
             db.session.rollback()
             flash('An error occurred while processing your order. Please try again.', 'error')
             return redirect(url_for('checkout'))
-    
+
     # Show confirmation page
     cart_items = []
     total = 0
-    
+
     for product_id, quantity in cart.items():
         product = Product.query.get(int(product_id))
         if product:
@@ -386,7 +384,7 @@ def checkout_confirmation():
                 'subtotal': subtotal
             })
             total += subtotal
-    
+
     return render_template('checkout/confirmation.html', 
                          cart_items=cart_items, 
                          total=total,
@@ -461,10 +459,10 @@ def inject_cart_count():
     """Inject cart item count into all templates"""
     cart = session.get('cart', {})
     total_items = sum(cart.values())
-    
+
     # Inject wishlist count for logged-in users
     wishlist_count = 0
     if current_user.is_authenticated:
         wishlist_count = Wishlist.query.filter_by(user_id=current_user.id).count()
-    
-    return {'cart_count': total_items, 'wishlist_count': wishlist_count}</old_str>
+
+    return {'cart_count': total_items, 'wishlist_count': wishlist_count}

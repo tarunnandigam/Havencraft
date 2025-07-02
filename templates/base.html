@@ -229,8 +229,247 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+    <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+```<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HavenCraft - Handmade Marketplace{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-style.css') }}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar bg-dark text-white py-1">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <small><i class="fas fa-truck me-1"></i>Free shipping on orders over $100</small>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small>
+                        <a href="#" class="text-white text-decoration-none me-3"><i class="fab fa-instagram me-1"></i>Follow us</a>
+                        <a href="#" class="text-white text-decoration-none"><i class="fas fa-phone me-1"></i>1-800-CRAFT</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+                <i class="fas fa-leaf text-primary me-2"></i>
+                <span class="brand-text">HavenCraft</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Search Bar (center) -->
+                <div class="mx-auto">
+                    <form class="search-form d-flex" method="GET" action="{{ url_for('products') }}">
+                        <div class="input-group search-input-group">
+                            <input class="form-control border-end-0" type="search" name="search" 
+                                   placeholder="Search for handmade products..." 
+                                   value="{{ request.args.get('search', '') }}">
+                            <button class="btn btn-outline-secondary border-start-0" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Side Actions -->
+                <div class="d-flex align-items-center ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <div class="dropdown me-3">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span>{{ current_user.get_full_name() }}</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('wishlist') }}"><i class="fas fa-heart me-2"></i>Wishlist <span class="badge bg-primary ms-1">{{ wishlist_count }}</span></a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('order_history') }}"><i class="fas fa-box me-2"></i>Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-primary me-2">Login</a>
+                        <a href="{{ url_for('register') }}" class="btn btn-primary me-3">Sign Up</a>
+                    {% endif %}
+
+                    <!-- Wishlist -->
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('wishlist') }}" class="nav-link me-3" title="Wishlist">
+                        <i class="fas fa-heart"></i>
+                        {% if wishlist_count > 0 %}
+                        <span class="badge bg-danger rounded-pill">{{ wishlist_count }}</span>
+                        {% endif %}
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link me-3" title="Wishlist">
+                        <i class="fas fa-heart"></i>
+                    </a>
+                    {% endif %}
+
+                    <!-- Cart -->
+                    <a href="{{ url_for('cart') }}" class="nav-link position-relative" title="Shopping Cart">
+                        <i class="fas fa-shopping-bag"></i>
+                        {% if cart_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                            {{ cart_count }}
+                        </span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Category Navigation -->
+    <nav class="category-nav bg-light border-bottom">
+        <div class="container">
+            <ul class="nav nav-pills flex-nowrap overflow-auto py-2">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{{ url_for('products') }}">All Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{{ url_for('products', category=1) }}">Jewelry</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{{ url_for('products', category=2) }}">Pottery</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{{ url_for('products', category=3) }}">Textiles</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{{ url_for('products', category=4) }}">Woodwork</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{{ url_for('products', category=5) }}">Home Decor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{{ url_for('products', category=6) }}">Art & Crafts</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show m-3">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="{% block main_class %}{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-5 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-leaf text-primary me-2"></i>HavenCraft
+                    </h5>
+                    <p class="text-muted">Connecting you with talented artisans and their beautiful handmade creations. Every purchase supports independent makers and preserves traditional crafts.</p>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Shop</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('products') }}" class="text-muted text-decoration-none">All Products</a></li>
+                        <li><a href="{{ url_for('products', category=1) }}" class="text-muted text-decoration-none">Jewelry</a></li>
+                        <li><a href="{{ url_for('products', category=2) }}" class="text-muted text-decoration-none">Pottery</a></li>
+                        <li><a href="{{ url_for('products', category=3) }}" class="text-muted text-decoration-none">Textiles</a></li>
+                        <li><a href="{{ url_for('products', category=4) }}" class="text-muted text-decoration-none">Woodwork</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Support</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('faq') }}" class="text-muted">FAQ</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-muted">Contact Us</a></li>
+                        <li><a href="{{ url_for('shipping_info') }}" class="text-muted">Shipping Info</a></li>
+                        <li><a href="{{ url_for('returns') }}" class="text-muted">Returns</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('about') }}" class="text-muted">About Us</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-muted">Careers</a></li>
+                        <li><a href="{{ url_for('privacy') }}" class="text-muted">Privacy Policy</a></li>
+                        <li><a href="{{ url_for('terms') }}" class="text-muted">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Connect</h6>
+                    <ul class="list-unstyled">
+                        <li class="text-muted"><i class="fas fa-envelope me-2"></i>hello@havencraft.com</li>
+                        <li class="text-muted"><i class="fas fa-phone me-2"></i>1-800-CRAFT</li>
+                        <li class="text-muted"><i class="fas fa-clock me-2"></i>Mon-Fri 9AM-6PM EST</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-muted mb-0">&copy; 2025 HavenCraft. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        <a href="#" class="text-muted text-decoration-none me-3">Privacy Policy</a>
+                        <a href="#" class="text-muted text-decoration-none me-3">Terms of Service</a>
+                        <a href="#" class="text-muted text-decoration-none">Cookie Policy</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
 
     {% block extra_scripts %}{% endblock %}
 </body>

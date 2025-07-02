@@ -208,3 +208,160 @@
 }
 </style>
 {% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Shipping Information - Handmade Store{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Progress indicator -->
+            <div class="checkout-progress mb-5">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <div class="step completed">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Review</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="step active">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Shipping</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Payment</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Confirm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Shipping Information</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="full_name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" 
+                                       value="{{ user_info.full_name }}" required>
+                                <div class="invalid-feedback">Please provide your full name.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address_line1" class="form-label">Address Line 1 *</label>
+                            <input type="text" class="form-control" id="address_line1" name="address_line1" 
+                                   placeholder="Street address" required>
+                            <div class="invalid-feedback">Please provide your address.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address_line2" class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control" id="address_line2" name="address_line2" 
+                                   placeholder="Apartment, suite, etc. (optional)">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">City *</label>
+                                <input type="text" class="form-control" id="city" name="city" required>
+                                <div class="invalid-feedback">Please provide your city.</div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="state" class="form-label">State *</label>
+                                <input type="text" class="form-control" id="state" name="state" required>
+                                <div class="invalid-feedback">Please provide your state.</div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="postal_code" class="form-label">Postal Code *</label>
+                                <input type="text" class="form-control" id="postal_code" name="postal_code" required>
+                                <div class="invalid-feedback">Please provide your postal code.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="country" class="form-label">Country *</label>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="">Choose...</option>
+                                    <option value="US" selected>United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="AU">Australia</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your country.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       value="{{ user_info.phone }}" placeholder="Optional">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('checkout') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Continue to Payment <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.checkout-progress .step {
+    position: relative;
+}
+
+.checkout-progress .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: bold;
+}
+
+.checkout-progress .step.active .step-number {
+    background: #0d6efd;
+    color: white;
+}
+
+.checkout-progress .step.completed .step-number {
+    background: #198754;
+    color: white;
+}
+
+.checkout-progress .step-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.checkout-progress .step.active .step-label,
+.checkout-progress .step.completed .step-label {
+    color: #0d6efd;
+}
+</style>
+{% endblock %}

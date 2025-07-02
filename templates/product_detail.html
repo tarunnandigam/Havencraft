@@ -76,31 +76,37 @@
             </div>
 
             <!-- Add to Cart Form -->
-            {% if product.stock_quantity > 0 %}
-            <form method="POST" action="{{ url_for('add_to_cart') }}" class="add-to-cart-form">
-                <input type="hidden" name="product_id" value="{{ product.id }}">
-                <div class="row g-3 align-items-end">
-                    <div class="col-auto">
-                        <label for="quantity" class="form-label">Quantity</label>
-                        <select name="quantity" id="quantity" class="form-select" style="width: 80px;">
-                            {% for i in range(1, [product.stock_quantity + 1, 11]|min) %}
-                            <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+            
+            <div class="product-actions">
+                {% if product.stock_quantity > 0 %}
+                <form class="add-to-cart-form" method="POST" action="{{ url_for('add_to_cart') }}">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <div class="d-flex align-items-center mb-3">
+                        <label for="quantity" class="form-label me-3">Quantity:</label>
+                        <div class="input-group" style="width: 120px;">
+                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
+                            <input type="number" class="form-control text-center" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}">
+                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
+                        </div>
                     </div>
-                    <div class="col">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+
+                    <div class="d-flex gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg flex-fill">
+                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
                         </button>
+                        {% if current_user.is_authenticated %}
+                        <button type="button" class="btn btn-outline-danger" onclick="toggleWishlist({{ product.id }})" data-wishlist-product-id="{{ product.id }}">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        {% endif %}
                     </div>
+                </form>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>This item is currently out of stock.
                 </div>
-            </form>
-            {% else %}
-            <div class="alert alert-warning">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                This item is currently out of stock.
+                {% endif %}
             </div>
-            {% endif %}
 
             <!-- Product Features -->
             <div class="product-features mt-4">
