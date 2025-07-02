@@ -1,0 +1,108 @@
+<svg width="1200" height="600" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FDF5E6;stop-opacity:0.9" />
+      <stop offset="50%" style="stop-color:#F5F5DC;stop-opacity:0.7" />
+      <stop offset="100%" style="stop-color:#FAEBD7;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <radialGradient id="craftGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#DAA520;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#8B4513;stop-opacity:0.05" />
+    </radialGradient>
+  </defs>
+  
+  <rect width="1200" height="600" fill="url(#heroGrad)"/>
+  <rect width="1200" height="600" fill="url(#craftGlow)"/>
+  
+  <!-- Artistic craft elements scattered -->
+  <g opacity="0.15" fill="#8B4513">
+    <!-- Pottery wheels -->
+    <g transform="translate(150, 120)">
+      <circle cx="0" cy="0" r="40" fill="none" stroke="#8B4513" stroke-width="3"/>
+      <circle cx="0" cy="0" r="25" fill="#D2691E" opacity="0.3"/>
+      <circle cx="0" cy="0" r="15" fill="#A0522D" opacity="0.5"/>
+    </g>
+    
+    <!-- Weaving loom pattern -->
+    <g transform="translate(900, 150)">
+      <rect x="0" y="0" width="60" height="80" fill="none" stroke="#8B4513" stroke-width="2" rx="5"/>
+      <line x1="10" y1="0" x2="10" y2="80" stroke="#D2691E" stroke-width="1"/>
+      <line x1="20" y1="0" x2="20" y2="80" stroke="#D2691E" stroke-width="1"/>
+      <line x1="30" y1="0" x2="30" y2="80" stroke="#D2691E" stroke-width="1"/>
+      <line x1="40" y1="0" x2="40" y2="80" stroke="#D2691E" stroke-width="1"/>
+      <line x1="50" y1="0" x2="50" y2="80" stroke="#D2691E" stroke-width="1"/>
+      
+      <line x1="0" y1="20" x2="60" y2="20" stroke="#DAA520" stroke-width="2"/>
+      <line x1="0" y1="40" x2="60" y2="40" stroke="#DAA520" stroke-width="2"/>
+      <line x1="0" y1="60" x2="60" y2="60" stroke="#DAA520" stroke-width="2"/>
+    </g>
+    
+    <!-- Jewelry tools -->
+    <g transform="translate(200, 450)">
+      <rect x="0" y="0" width="3" height="40" fill="#A0522D" rx="1"/>
+      <circle cx="1.5" cy="0" r="4" fill="#DAA520"/>
+      <rect x="10" y="0" width="2" height="35" fill="#A0522D" rx="1"/>
+      <circle cx="11" cy="0" r="3" fill="#8B4513"/>
+    </g>
+    
+    <!-- Wood carving chisels -->
+    <g transform="translate(1000, 400)">
+      <rect x="0" y="0" width="4" height="50" fill="#654321" rx="2"/>
+      <rect x="0" y="0" width="6" height="8" fill="#B8860B" rx="1"/>
+      
+      <rect x="10" y="0" width="3" height="45" fill="#654321" rx="1"/>
+      <rect x="9" y="0" width="5" height="6" fill="#B8860B" rx="1"/>
+      
+      <rect x="20" y="0" width="5" height="55" fill="#654321" rx="2"/>
+      <rect x="19" y="0" width="7" height="10" fill="#B8860B" rx="1"/>
+    </g>
+    
+    <!-- Decorative Celtic knots -->
+    <g transform="translate(80, 300)">
+      <circle cx="0" cy="0" r="30" fill="none" stroke="#DAA520" stroke-width="4"/>
+      <path d="M-20 -20 Q0 -30, 20 -20 Q30 0, 20 20 Q0 30, -20 20 Q-30 0, -20 -20" 
+            fill="none" stroke="#8B4513" stroke-width="3"/>
+    </g>
+    
+    <!-- Thread spools -->
+    <g transform="translate(1050, 200)">
+      <ellipse cx="0" cy="0" rx="15" ry="25" fill="#D2691E"/>
+      <ellipse cx="0" cy="-20" rx="12" ry="5" fill="#8B4513"/>
+      <ellipse cx="0" cy="20" rx="12" ry="5" fill="#8B4513"/>
+      <ellipse cx="0" cy="0" rx="10" ry="20" fill="#A0522D"/>
+      
+      <ellipse cx="30" cy="10" rx="12" ry="20" fill="#DAA520"/>
+      <ellipse cx="30" cy="-10" rx="10" ry="4" fill="#8B4513"/>
+      <ellipse cx="30" cy="30" rx="10" ry="4" fill="#8B4513"/>
+    </g>
+    
+    <!-- Ceramic vessels silhouettes -->
+    <g transform="translate(300, 500)">
+      <path d="M0 20 Q-15 0, -10 -20 Q0 -30, 10 -20 Q15 0, 0 20" fill="#A0522D" opacity="0.4"/>
+      <ellipse cx="0" cy="20" rx="15" ry="4" fill="#8B4513"/>
+      
+      <path d="M40 15 Q30 0, 35 -15 Q40 -20, 45 -15 Q50 0, 40 15" fill="#D2691E" opacity="0.4"/>
+      <ellipse cx="40" cy="15" rx="12" ry="3" fill="#8B4513"/>
+    </g>
+    
+    <!-- Natural elements -->
+    <g transform="translate(700, 350)" fill="#228B22" opacity="0.3">
+      <!-- Leaves -->
+      <path d="M0 0 Q10 -5, 20 0 Q15 10, 0 15 Q-15 10, 0 0"/>
+      <path d="M30 5 Q40 0, 50 5 Q45 15, 30 20 Q15 15, 30 5"/>
+      <path d="M10 25 Q20 20, 30 25 Q25 35, 10 40 Q-5 35, 10 25"/>
+    </g>
+  </g>
+  
+  <!-- Subtle texture overlay -->
+  <g opacity="0.05">
+    <pattern id="craftTexture" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="1" fill="#8B4513"/>
+      <circle cx="30" cy="20" r="0.5" fill="#D2691E"/>
+      <circle cx="20" cy="35" r="1.5" fill="#A0522D"/>
+    </pattern>
+    <rect width="1200" height="600" fill="url(#craftTexture)"/>
+  </g>
+</svg>

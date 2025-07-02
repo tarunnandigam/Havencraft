@@ -1,0 +1,67 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="400" fill="#faf8f5"/>
+  
+  <!-- Table surface reflection -->
+  <ellipse cx="200" cy="385" rx="140" ry="15" fill="#000" opacity="0.08"/>
+  
+  <!-- Artistic ceramic vase -->
+  <g transform="translate(200, 300)">
+    <!-- Shadow -->
+    <ellipse cx="0" cy="50" rx="45" ry="12" fill="#000" opacity="0.2"/>
+    
+    <!-- Vase base -->
+    <ellipse cx="0" cy="40" rx="40" ry="12" fill="#8B4513"/>
+    
+    <!-- Vase body -->
+    <path d="M-35 40 Q-40 -20, -25 -60 Q0 -80, 25 -60 Q40 -20, 35 40" fill="#A0522D"/>
+    
+    <!-- Vase neck -->
+    <path d="M-25 -60 Q-20 -80, -15 -90 Q0 -95, 15 -90 Q20 -80, 25 -60" fill="#D2691E"/>
+    
+    <!-- Rim -->
+    <ellipse cx="0" cy="-60" rx="25" ry="5" fill="#8B4513"/>
+    <ellipse cx="0" cy="-62" rx="23" ry="4" fill="#DAA520"/>
+    
+    <!-- Decorative glaze pattern -->
+    <g stroke="#DAA520" stroke-width="3" fill="none" opacity="0.8">
+      <path d="M-30 20 Q0 15, 30 20"/>
+      <path d="M-25 0 Q0 -5, 25 0"/>
+      <path d="M-20 -20 Q0 -25, 20 -20"/>
+      <path d="M-15 -40 Q0 -45, 15 -40"/>
+    </g>
+    
+    <!-- Reactive glaze spots -->
+    <g fill="#654321" opacity="0.4">
+      <circle cx="-15" cy="10" r="8"/>
+      <circle cx="20" cy="-10" r="6"/>
+      <circle cx="-10" cy="-30" r="5"/>
+      <circle cx="15" cy="-50" r="4"/>
+    </g>
+    
+    <!-- Highlights -->
+    <g fill="#fff" opacity="0.7">
+      <ellipse cx="-18" cy="-20" rx="6" ry="12"/>
+      <ellipse cx="8" cy="0" rx="4" ry="8"/>
+      <circle cx="-5" cy="-70" r="3"/>
+    </g>
+  </g>
+  
+  <!-- Additional pottery piece - small dish -->
+  <g transform="translate(100, 320)">
+    <ellipse cx="0" cy="20" rx="30" ry="8" fill="#8B4513" opacity="0.3"/>
+    <ellipse cx="0" cy="15" rx="28" ry="6" fill="#CD853F"/>
+    <ellipse cx="0" cy="12" rx="24" ry="4" fill="#DEB887"/>
+    <ellipse cx="0" cy="10" rx="20" ry="3" fill="#F4A460"/>
+    
+    <!-- Glaze detail -->
+    <ellipse cx="0" cy="10" rx="16" ry="2" fill="#DAA520" opacity="0.6"/>
+    <ellipse cx="-5" cy="9" rx="4" ry="1" fill="#fff" opacity="0.8"/>
+  </g>
+  
+  <!-- Artisan tools suggestion -->
+  <g transform="translate(320, 120)" fill="#8B4513" opacity="0.3">
+    <rect x="0" y="0" width="2" height="30" rx="1"/>
+    <circle cx="1" cy="0" r="3"/>
+  </g>
+</svg>
