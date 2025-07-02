@@ -1,18 +1,19 @@
-# Artisan Marketplace - Handmade Crafts E-commerce Platform
+# HavenCraft - Professional Handmade Marketplace
 
 ## Overview
 
-Artisan Marketplace is a Flask-based e-commerce web application designed for selling handmade crafts and artisanal products. The platform features a clean, responsive interface with product browsing, search functionality, shopping cart management, and category-based filtering. The application emphasizes the handmade, artisanal nature of products with a warm, earthy design aesthetic.
+HavenCraft is a modern, professional e-commerce platform for handmade products, inspired by leading marketplaces like Myntra and Flipkart. The platform features user authentication, comprehensive product catalog with 22+ items, modern responsive design, shopping cart functionality, and deployment-ready architecture with PostgreSQL database support.
 
 ## System Architecture
 
-The application follows a traditional Model-View-Controller (MVC) architecture pattern using Flask as the web framework:
+Modern MVC architecture with professional e-commerce features:
 
-- **Frontend**: Server-side rendered HTML templates using Jinja2, styled with Bootstrap 5 and custom CSS
-- **Backend**: Flask web application with SQLAlchemy ORM for database operations
-- **Database**: SQLite for development (with PostgreSQL support for production)
-- **Session Management**: Flask sessions for cart functionality
-- **Static Assets**: CSS, JavaScript, and images served from static directory
+- **Frontend**: Server-side rendered HTML templates with Jinja2, Bootstrap 5.3.2, modern CSS Grid/Flexbox
+- **Backend**: Flask web application with SQLAlchemy ORM and Flask-Login authentication
+- **Database**: PostgreSQL for production with comprehensive product catalog (22+ items, 6 categories)
+- **Authentication**: User registration, login, profile management with secure password hashing
+- **Session Management**: Flask sessions for cart functionality and user state
+- **Design**: Myntra/Flipkart-inspired modern responsive interface
 
 ## Key Components
 

@@ -15,7 +15,7 @@ db = SQLAlchemy(model_class=Base)
 
 # Create the app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "handmade-crafts-secret-key-2025")
+app.secret_key = os.environ.get("SESSION_SECRET")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configure the database
@@ -35,6 +35,7 @@ db.init_app(app)
 with app.app_context():
     # Import models and routes
     import models
+    import auth_routes
     import routes
     
     # Create all tables

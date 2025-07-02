@@ -8,7 +8,11 @@ def index():
     """Homepage with featured products"""
     featured_products = Product.query.filter_by(featured=True).limit(4).all()
     categories = Category.query.all()
-    return render_template('index.html', featured_products=featured_products, categories=categories)
+    products = Product.query.all()
+    return render_template('index.html', 
+                         featured_products=featured_products, 
+                         categories=categories,
+                         products=products)
 
 @app.route('/products')
 def products():

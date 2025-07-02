@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - HavenCraft{% endblock %}
+
+{% block main_class %}d-flex align-items-center py-5{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-custom border-0 rounded-custom">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-leaf text-primary fs-1 mb-3"></i>
+                        <h2 class="h4 mb-1">Join HavenCraft</h2>
+                        <p class="text-muted">Discover amazing handmade products from talented artisans</p>
+                    </div>
+
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="first_name" 
+                                       name="first_name"
+                                       placeholder="Enter first name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="last_name" 
+                                       name="last_name"
+                                       placeholder="Enter last name">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="username" 
+                                   name="username" 
+                                   required
+                                   placeholder="Choose a username">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address *</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   required
+                                   placeholder="Enter your email">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" 
+                                   class="form-control" 
+                                   id="phone" 
+                                   name="phone"
+                                   placeholder="Enter phone number">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="password" 
+                                       name="password" 
+                                       required
+                                       placeholder="Create password">
+                                <div class="form-text">At least 6 characters</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirm_password" class="form-label">Confirm Password *</label>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="confirm_password" 
+                                       name="confirm_password" 
+                                       required
+                                       placeholder="Confirm password">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> 
+                                and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
+
+                        <div class="text-center">
+                            <small class="text-muted">
+                                Already have an account? 
+                                <a href="{{ url_for('login') }}" class="text-decoration-none">Sign in here</a>
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Benefits -->
+            <div class="row mt-4 text-center">
+                <div class="col-md-4">
+                    <i class="fas fa-heart text-primary mb-2"></i>
+                    <small class="d-block text-muted">Support artisans worldwide</small>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-shipping-fast text-primary mb-2"></i>
+                    <small class="d-block text-muted">Free shipping over $100</small>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-star text-primary mb-2"></i>
+                    <small class="d-block text-muted">Exclusive member benefits</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
