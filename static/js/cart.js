@@ -1,5 +1,4 @@
 // Cart functionality for Artisan Marketplace
-
 class Cart {
     constructor() {
         this.items = this.loadCart();
@@ -49,12 +48,12 @@ class Cart {
             const formData = new FormData();
             formData.append('product_id', productId);
             formData.append('quantity', quantity);
-            
+
             const response = await fetch('/add_to_cart', {
                 method: 'POST',
                 body: formData
             });
-            
+
             if (response.ok) {
                 // Update local cart after successful server update
                 if (this.items[productId]) {
@@ -78,7 +77,7 @@ class Cart {
     async removeItem(productId) {
         try {
             const response = await fetch(`/remove_from_cart/${productId}`);
-            
+
             if (response.ok) {
                 // Update local cart after successful server update
                 if (this.items[productId]) {
@@ -116,7 +115,7 @@ class Cart {
     updateCartUI() {
         const cartCount = this.getTotalCount();
         const cartBadges = document.querySelectorAll('.cart-count, .badge');
-        
+
         cartBadges.forEach(badge => {
             if (badge.classList.contains('cart-count') || badge.closest('.btn')) {
                 if (cartCount > 0) {
@@ -148,7 +147,7 @@ class Cart {
             min-width: 300px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         `;
-        
+
         notification.innerHTML = `
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -166,13 +165,27 @@ class Cart {
 
     // Bind events
     bindEvents() {
-        // Add to cart buttons
+        // Add to cart form submissions
+        document.addEventListener('submit', (e) => {
+            if (e.target.classList.contains('add-to-cart-form') || e.target.action?.includes('add_to_cart')) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const productId = formData.get('product_id');
+                const quantity = parseInt(formData.get('quantity') || 1);
+
+                if (productId) {
+                    this.addItem(productId, quantity);
+                }
+            }
+        });
+
+        // Add to cart buttons with data attributes
         document.addEventListener('click', (e) => {
             if (e.target.matches('.add-to-cart, .add-to-cart *')) {
                 const button = e.target.closest('.add-to-cart') || e.target;
                 const productId = button.dataset.productId;
                 const quantity = parseInt(button.dataset.quantity || 1);
-                
+
                 if (productId) {
                     e.preventDefault();
                     this.addItem(productId, quantity);
@@ -199,7 +212,7 @@ class Cart {
                     input.dispatchEvent(new Event('change'));
                 }
             }
-            
+
             if (e.target.matches('.qty-increase')) {
                 const input = e.target.previousElementSibling;
                 const currentValue = parseInt(input.value);

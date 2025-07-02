@@ -203,6 +203,12 @@ def checkout():
 @login_required
 def checkout_shipping():
     """Checkout step 2: Shipping information"""
+    # Check if cart exists
+    cart = session.get('cart', {})
+    if not cart:
+        flash('Your cart is empty', 'info')
+        return redirect(url_for('products'))
+    
     if request.method == 'POST':
         # Store shipping info in session
         session['shipping_info'] = {
@@ -219,8 +225,8 @@ def checkout_shipping():
     
     # Pre-fill with user information if available
     user_info = {
-        'full_name': current_user.get_full_name(),
-        'phone': current_user.phone or ''
+        'full_name': getattr(current_user, 'first_name', '') + ' ' + getattr(current_user, 'last_name', ''),
+        'phone': getattr(current_user, 'phone', '') or ''
     }
     
     return render_template('checkout/shipping.html', user_info=user_info)
@@ -229,7 +235,15 @@ def checkout_shipping():
 @login_required
 def checkout_payment():
     """Checkout step 3: Payment information"""
+    # Check if cart exists
+    cart = session.get('cart', {})
+    if not cart:
+        flash('Your cart is empty', 'info')
+        return redirect(url_for('products'))
+    
+    # Check if shipping info exists
     if 'shipping_info' not in session:
+        flash('Please provide shipping information first', 'warning')
         return redirect(url_for('checkout_shipping'))
     
     if request.method == 'POST':
@@ -245,7 +259,6 @@ def checkout_payment():
         return redirect(url_for('checkout_confirmation'))
     
     # Calculate total
-    cart = session.get('cart', {})
     total = 0
     for product_id, quantity in cart.items():
         product = Product.query.get(int(product_id))
@@ -258,13 +271,20 @@ def checkout_payment():
 @login_required
 def checkout_confirmation():
     """Checkout step 4: Order confirmation"""
-    if 'shipping_info' not in session or 'payment_info' not in session:
-        return redirect(url_for('checkout'))
-    
+    # Check if cart exists
     cart = session.get('cart', {})
     if not cart:
         flash('Your cart is empty', 'error')
         return redirect(url_for('products'))
+    
+    # Check if required session data exists
+    if 'shipping_info' not in session:
+        flash('Please provide shipping information first', 'warning')
+        return redirect(url_for('checkout_shipping'))
+    
+    if 'payment_info' not in session:
+        flash('Please provide payment information first', 'warning')
+        return redirect(url_for('checkout_payment'))
     
     if request.method == 'POST':
         # Process the order

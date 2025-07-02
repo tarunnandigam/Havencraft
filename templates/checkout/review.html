@@ -71,7 +71,7 @@
                     Continue to Shipping <i class="fas fa-arrow-right ms-1"></i>
                 </a>
                 {% else %}
-                <a href="{{ url_for('login') }}" class="btn btn-primary">
+                <a href="{{ url_for('auth.login') }}?next={{ url_for('checkout_shipping') }}" class="btn btn-primary">
                     Login to Continue <i class="fas fa-arrow-right ms-1"></i>
                 </a>
                 {% endif %}
