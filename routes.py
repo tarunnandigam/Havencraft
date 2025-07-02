@@ -220,8 +220,10 @@ def checkout_shipping():
         
         if missing_fields:
             flash(f'Please fill in the following fields: {", ".join(missing_fields)}', 'error')
+            # Retain form data and show validation errors
+            form_data = request.form.to_dict()
             return render_template('checkout/shipping.html', 
-                                 user_info=request.form.to_dict(),
+                                 user_info=form_data,
                                  errors=missing_fields)
 
         # Store shipping info in session
@@ -242,7 +244,8 @@ def checkout_shipping():
     # Pre-fill with user information if available
     user_info = {
         'full_name': (getattr(current_user, 'first_name', '') + ' ' + getattr(current_user, 'last_name', '')).strip() or current_user.username,
-        'phone': getattr(current_user, 'phone', '') or ''
+        'phone': getattr(current_user, 'phone', '') or '',
+        'country': 'US'  # Default country
     }
 
     return render_template('checkout/shipping.html', user_info=user_info)

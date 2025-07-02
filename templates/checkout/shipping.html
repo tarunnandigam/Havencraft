@@ -46,43 +46,46 @@
                             <div class="col-md-6 mb-3">
                                 <label for="full_name" class="form-label">Full Name *</label>
                                 <input type="text" class="form-control" id="full_name" name="full_name" 
-                                       value="{{ user_info.full_name or '' }}" required>
+                                       value="{{ user_info.get('full_name', '') }}" required>
                                 <div class="invalid-feedback">Please provide your full name.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Phone Number</label>
                                 <input type="tel" class="form-control" id="phone" name="phone" 
-                                       value="{{ user_info.phone or '' }}" placeholder="+1 (555) 123-4567">
+                                       value="{{ user_info.get('phone', '') }}" placeholder="+1 (555) 123-4567">
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="address_line1" class="form-label">Address Line 1 *</label>
                             <input type="text" class="form-control" id="address_line1" name="address_line1" 
-                                   placeholder="123 Main Street" required>
+                                   value="{{ user_info.get('address_line1', '') }}" placeholder="123 Main Street" required>
                             <div class="invalid-feedback">Please provide your address.</div>
                         </div>
 
                         <div class="mb-3">
                             <label for="address_line2" class="form-label">Address Line 2</label>
                             <input type="text" class="form-control" id="address_line2" name="address_line2" 
-                                   placeholder="Apartment, suite, etc. (optional)">
+                                   value="{{ user_info.get('address_line2', '') }}" placeholder="Apartment, suite, etc. (optional)">
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="city" class="form-label">City *</label>
-                                <input type="text" class="form-control" id="city" name="city" required>
+                                <input type="text" class="form-control" id="city" name="city" 
+                                       value="{{ user_info.get('city', '') }}" required>
                                 <div class="invalid-feedback">Please provide a valid city.</div>
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label for="state" class="form-label">State *</label>
-                                <input type="text" class="form-control" id="state" name="state" required>
+                                <input type="text" class="form-control" id="state" name="state" 
+                                       value="{{ user_info.get('state', '') }}" required>
                                 <div class="invalid-feedback">Please provide a valid state.</div>
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label for="postal_code" class="form-label">Postal Code *</label>
-                                <input type="text" class="form-control" id="postal_code" name="postal_code" required>
+                                <input type="text" class="form-control" id="postal_code" name="postal_code" 
+                                       value="{{ user_info.get('postal_code', '') }}" required>
                                 <div class="invalid-feedback">Please provide a valid postal code.</div>
                             </div>
                         </div>
@@ -91,16 +94,16 @@
                             <label for="country" class="form-label">Country *</label>
                             <select class="form-select" id="country" name="country" required>
                                 <option value="">Choose...</option>
-                                <option value="US" selected>United States</option>
-                                <option value="CA">Canada</option>
-                                <option value="MX">Mexico</option>
-                                <option value="GB">United Kingdom</option>
-                                <option value="FR">France</option>
-                                <option value="DE">Germany</option>
-                                <option value="IT">Italy</option>
-                                <option value="ES">Spain</option>
-                                <option value="AU">Australia</option>
-                                <option value="JP">Japan</option>
+                                <option value="US" {% if user_info.get('country', 'US') == 'US' %}selected{% endif %}>United States</option>
+                                <option value="CA" {% if user_info.get('country') == 'CA' %}selected{% endif %}>Canada</option>
+                                <option value="MX" {% if user_info.get('country') == 'MX' %}selected{% endif %}>Mexico</option>
+                                <option value="GB" {% if user_info.get('country') == 'GB' %}selected{% endif %}>United Kingdom</option>
+                                <option value="FR" {% if user_info.get('country') == 'FR' %}selected{% endif %}>France</option>
+                                <option value="DE" {% if user_info.get('country') == 'DE' %}selected{% endif %}>Germany</option>
+                                <option value="IT" {% if user_info.get('country') == 'IT' %}selected{% endif %}>Italy</option>
+                                <option value="ES" {% if user_info.get('country') == 'ES' %}selected{% endif %}>Spain</option>
+                                <option value="AU" {% if user_info.get('country') == 'AU' %}selected{% endif %}>Australia</option>
+                                <option value="JP" {% if user_info.get('country') == 'JP' %}selected{% endif %}>Japan</option>
                             </select>
                             <div class="invalid-feedback">Please select a valid country.</div>
                         </div>
@@ -128,22 +131,63 @@
 </div>
 
 <script>
-// Form validation
+// Form validation and submission handling
 (function() {
     'use strict';
     window.addEventListener('load', function() {
         var forms = document.getElementsByClassName('needs-validation');
         var validation = Array.prototype.filter.call(forms, function(form) {
             form.addEventListener('submit', function(event) {
+                console.log('Form submission attempted');
+                
                 if (form.checkValidity() === false) {
+                    console.log('Form validation failed');
                     event.preventDefault();
                     event.stopPropagation();
+                    
+                    // Focus on first invalid field
+                    var firstInvalid = form.querySelector(':invalid');
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                        firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    }
+                } else {
+                    console.log('Form validation passed, submitting...');
+                    // Show loading state
+                    var submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+                    }
                 }
                 form.classList.add('was-validated');
             }, false);
         });
     }, false);
 })();
+
+// Add real-time validation feedback
+document.addEventListener('DOMContentLoaded', function() {
+    const requiredFields = document.querySelectorAll('input[required], select[required]');
+    
+    requiredFields.forEach(field => {
+        field.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+        
+        field.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+});
 </script>
 
 <style>
