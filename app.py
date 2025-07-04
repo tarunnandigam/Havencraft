@@ -36,27 +36,30 @@ db.init_app(app)
 # Import models and routes after app and db are created
 from models import init_sample_data
 
-with app.app_context():
-    # Import routes after models are defined
-    import auth_routes
-    import routes
-    
-    # Create all tables
-    try:
+def initialize_database():
+    with app.app_context():
+        # Create all tables
         print("Creating database tables...")
         db.create_all()
         print("Database tables created successfully!")
         
         # Initialize sample data if database is empty
-        if not db.session.query(db.exists().select_from(db.metadata.tables['product'])).scalar():
-            print("Initializing sample data...")
-            init_sample_data()
-            print("Sample data initialized!")
-    except Exception as e:
-        print(f"Error initializing database: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        raise
+        try:
+            if not db.session.query(db.exists().select_from(db.metadata.tables['product'])).scalar():
+                print("Initializing sample data...")
+                init_sample_data()
+                print("Sample data initialized!")
+        except Exception as e:
+            print(f"Error initializing sample data: {str(e)}")
+            import traceback
+            traceback.print_exc()
+
+# Import routes after models are defined
+import auth_routes
+import routes
+
+# Initialize database when app starts
+initialize_database()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
