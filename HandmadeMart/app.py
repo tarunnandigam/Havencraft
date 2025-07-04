@@ -5,11 +5,11 @@ from flask import Flask, jsonify
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_migrate import Migrate
 
-# Add the parent directory to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the current directory to the Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Now import using the full package path
-from HandmadeMart.extensions import db
+# Import local modules
+from extensions import db
 
 # Configure logging for debugging
 logging.basicConfig(level=logging.DEBUG)
@@ -38,11 +38,10 @@ migrate = Migrate(app, db)
 
 with app.app_context():
     # Import models first to ensure tables are defined
-    from models import init_sample_data
+    from HandmadeMart.models import init_sample_data
     
     # Import routes after models are defined
-    import auth_routes
-    import routes
+    from HandmadeMart import auth_routes, routes
     
     # Create all tables
     db.create_all()
