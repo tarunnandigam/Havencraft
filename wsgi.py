@@ -6,13 +6,12 @@ import os
 from HandmadeMart.app import create_app
 
 # Create the Flask application
-application = create_app()
+app = create_app()
 
 # Initialize database tables if they don't exist
-with application.app_context():
-    from HandmadeMart.models import db
+with app.app_context():
     db.create_all()
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    application.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

@@ -23,15 +23,18 @@ def create_app():
 
     # Database configuration - use DATABASE_URL from environment variables
     database_uri = os.environ.get('DATABASE_URL', 'sqlite:///handmademart.db')
+    
     if database_uri.startswith('postgres://'):
         database_uri = database_uri.replace('postgres://', 'postgresql://', 1)
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        'pool_recycle': 300,
-        'pool_pre_ping': True,
-        'connect_args': {'sslmode': 'require'}
-    }
+        # For PostgreSQL, use the URI as is - Railway automatically handles SSL
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'pool_recycle': 300,
+            'pool_pre_ping': True
+        }
+    else:
+        # For SQLite
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize extensions with app
