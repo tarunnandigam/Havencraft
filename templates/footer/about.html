@@ -1,0 +1,45 @@
+
+{% extends "base.html" %}
+
+{% block title %}About Us - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="display-4 text-center mb-5">About HavenCraft</h1>
+            
+            <div class="mb-5">
+                <h2 class="h3 mb-3">Our Story</h2>
+                <p class="lead">HavenCraft was born from a passion for authentic handmade crafts and a desire to connect talented artisans with people who appreciate quality, unique items.</p>
+                <p>Founded in 2020, we started as a small marketplace dedicated to preserving traditional craftsmanship while providing artisans with a global platform to showcase their work. Today, we're proud to host over 500 artisans from 50+ countries, each bringing their unique cultural heritage and skills to our community.</p>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="h3 mb-3">Our Mission</h2>
+                <p>We believe that every handmade item tells a story - of tradition, skill, and passion. Our mission is to:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Support independent artisans worldwide</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Preserve traditional craftsmanship techniques</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Provide customers with authentic, high-quality handmade products</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary me-2"></i>Build a sustainable marketplace that benefits everyone</li>
+                </ul>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="h3 mb-3">Why Choose Handmade?</h2>
+                <p>In a world of mass production, handmade items stand out for their uniqueness, quality, and the human touch that goes into every piece. When you buy handmade, you're not just purchasing a product - you're supporting an artisan's livelihood, preserving cultural traditions, and getting something truly special.</p>
+            </div>
+
+            <div class="text-center">
+                <h2 class="h3 mb-3">Join Our Community</h2>
+                <p>Whether you're an artisan looking to showcase your work or a customer seeking unique handmade treasures, we invite you to be part of the HavenCraft family.</p>
+                <div class="mt-4">
+                    <a href="{{ url_for('products') }}" class="btn btn-primary me-3">Explore Products</a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-primary">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

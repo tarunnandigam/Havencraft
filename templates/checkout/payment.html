@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Information - Handmade Store{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Progress indicator -->
+            <div class="checkout-progress mb-5">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <div class="step completed">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Review</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="step completed">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Shipping</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="step active">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Payment</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Confirm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Payment Information</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('checkout_payment') }}" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <h5>Order Total: ${{ "%.2f"|format(total) }}</h5>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Payment Method *</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" 
+                                       id="credit_card" value="credit_card" checked>
+                                <label class="form-check-label" for="credit_card">
+                                    <i class="fab fa-cc-visa me-2"></i>
+                                    <i class="fab fa-cc-mastercard me-2"></i>
+                                    Credit/Debit Card
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" 
+                                       id="paypal" value="paypal">
+                                <label class="form-check-label" for="paypal">
+                                    <i class="fab fa-paypal me-2"></i>PayPal
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="card-details">
+                            <div class="mb-3">
+                                <label for="card_name" class="form-label">Cardholder Name *</label>
+                                <input type="text" class="form-control" id="card_name" name="card_name" required>
+                                <div class="invalid-feedback">Please provide the cardholder name.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="card_number" class="form-label">Card Number *</label>
+                                <input type="text" class="form-control" id="card_number" name="card_number" 
+                                       placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                <div class="invalid-feedback">Please provide a valid card number.</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="expiry_month" class="form-label">Month *</label>
+                                    <select class="form-select" id="expiry_month" name="expiry_month" required>
+                                        <option value="">Month</option>
+                                        {% for month in range(1, 13) %}
+                                        <option value="{{ '%02d'|format(month) }}">{{ '%02d'|format(month) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Please select expiry month.</div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="expiry_year" class="form-label">Year *</label>
+                                    <select class="form-select" id="expiry_year" name="expiry_year" required>
+                                        <option value="">Year</option>
+                                        {% for year in range(2024, 2035) %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Please select expiry year.</div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="cvv" class="form-label">CVV *</label>
+                                    <input type="text" class="form-control" id="cvv" name="cvv" 
+                                           placeholder="123" maxlength="4" required>
+                                    <div class="invalid-feedback">Please provide CVV.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('checkout_shipping') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Shipping
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Continue to Confirmation <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+    const cardDetails = document.getElementById('card-details');
+
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', function() {
+            if (this.value === 'credit_card') {
+                cardDetails.style.display = 'block';
+                cardDetails.querySelectorAll('input, select').forEach(input => {
+                    input.required = true;
+                });
+            } else {
+                cardDetails.style.display = 'none';
+                cardDetails.querySelectorAll('input, select').forEach(input => {
+                    input.required = false;
+                });
+            }
+        });
+    });
+
+    // Format card number
+    const cardNumberInput = document.getElementById('card_number');
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function() {
+            let value = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            this.value = formattedValue;
+        });
+    }
+});
+</script>
+
+<style>
+.checkout-progress .step {
+    position: relative;
+}
+
+.checkout-progress .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: bold;
+}
+
+.checkout-progress .step.active .step-number {
+    background: #0d6efd;
+    color: white;
+}
+
+.checkout-progress .step.completed .step-number {
+    background: #198754;
+    color: white;
+}
+
+.checkout-progress .step-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.checkout-progress .step.active .step-label,
+.checkout-progress .step.completed .step-label {
+    color: #0d6efd;
+}
+</style>
+{% endblock %}

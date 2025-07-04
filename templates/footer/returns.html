@@ -1,0 +1,64 @@
+
+{% extends "base.html" %}
+
+{% block title %}Returns Policy - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="display-4 text-center mb-5">Returns Policy</h1>
+            
+            <div class="mb-5">
+                <h2 class="h3 mb-3">30-Day Return Policy</h2>
+                <p>We want you to love your handmade purchase! If you're not completely satisfied, you can return most items within 30 days of delivery for a full refund or exchange.</p>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="h3 mb-3">Return Conditions</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Items must be in original, unused condition</li>
+                    <li class="list-group-item">Original packaging and tags must be included</li>
+                    <li class="list-group-item">Return must be initiated within 30 days of delivery</li>
+                    <li class="list-group-item">Customer is responsible for return shipping costs</li>
+                </ul>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="h3 mb-3">Non-Returnable Items</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Custom or personalized items</li>
+                    <li class="list-group-item">Perishable goods</li>
+                    <li class="list-group-item">Items damaged by misuse or normal wear</li>
+                    <li class="list-group-item">Intimate or sanitary goods</li>
+                </ul>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="h3 mb-3">How to Return</h2>
+                <ol class="list-group list-group-numbered">
+                    <li class="list-group-item">Contact our customer service team</li>
+                    <li class="list-group-item">Receive return authorization and instructions</li>
+                    <li class="list-group-item">Package item securely with original packaging</li>
+                    <li class="list-group-item">Ship to provided return address</li>
+                    <li class="list-group-item">Refund processed within 5-7 business days</li>
+                </ol>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="h3 mb-3">Exchanges</h2>
+                <p>We're happy to exchange items for different sizes or colors when available. Exchange shipping costs apply unless the item was defective or incorrect.</p>
+            </div>
+
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>Damaged Items</h5>
+                <p class="mb-0">If your item arrives damaged, please contact us immediately with photos. We'll provide a prepaid return label and full refund or replacement.</p>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">Start a Return</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

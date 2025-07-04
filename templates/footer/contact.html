@@ -1,0 +1,81 @@
+
+{% extends "base.html" %}
+
+{% block title %}Contact Us - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 text-center mb-5">Contact Us</h1>
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                            <h5>Email Us</h5>
+                            <p class="text-muted">Get in touch with our support team</p>
+                            <a href="mailto:support@havencraft.com" class="btn btn-outline-primary">support@havencraft.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                            <h5>Call Us</h5>
+                            <p class="text-muted">Speak with our customer service</p>
+                            <a href="tel:+1-555-HAVEN-CRAFT" class="btn btn-outline-primary">+1 (555) HAVEN-CRAFT</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h3 class="mb-0">Send us a Message</h3>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <select class="form-select" id="subject" required>
+                                <option value="">Choose a topic...</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="order">Order Support</option>
+                                <option value="artisan">Artisan Application</option>
+                                <option value="technical">Technical Issue</option>
+                                <option value="feedback">Feedback</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <h3>Business Hours</h3>
+                <p class="text-muted">Monday - Friday: 9:00 AM - 6:00 PM (EST)</p>
+                <p class="text-muted">Saturday: 10:00 AM - 4:00 PM (EST)</p>
+                <p class="text-muted">Sunday: Closed</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
