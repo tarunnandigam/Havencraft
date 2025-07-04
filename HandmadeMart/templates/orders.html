@@ -1,0 +1,215 @@
+
+{% extends "base.html" %}
+
+{% block title %}Order History - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 text-center mb-5">Order History</h1>
+            
+            {% if orders %}
+                {% for order in orders %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <h6 class="mb-0">Order #{{ order.id }}</h6>
+                                <small class="text-muted">{{ order.created_at.strftime('%B %d, %Y') }}</small>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="badge badge-status-{{ order.status }}">
+                                    {{ order.status.title() }}
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>${{ "%.2f"|format(order.total_amount) }}</strong>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#order-{{ order.id }}" aria-expanded="false">
+                                        View Details
+                                    </button>
+                                    {% if order.status in ['pending', 'confirmed'] %}
+                                    <form action="{{ url_for('cancel_order', order_id=order.id) }}" method="POST" class="cancel-order-form" data-order-id="{{ order.id }}">
+                                        <button type="button" class="btn btn-sm btn-outline-danger cancel-order-btn" 
+                                                data-order-id="{{ order.id }}">
+                                            Cancel Order
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="collapse" id="order-{{ order.id }}">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6>Items Ordered</h6>
+                                    {% for item in order.items %}
+                                    <div class="d-flex align-items-center py-2">
+                                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" 
+                                             class="order-item-image me-3">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ item.product.name }}</h6>
+                                            <small class="text-muted">Quantity: {{ item.quantity }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <strong>${{ "%.2f"|format(item.price * item.quantity) }}</strong>
+                                            <br>
+                                            <small class="text-muted">${{ "%.2f"|format(item.price) }} each</small>
+                                        </div>
+                                    </div>
+                                    {% if not loop.last %}<hr class="my-2">{% endif %}
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <h6>Shipping Address</h6>
+                                    <address class="mb-3">
+                                        {{ order.shipping_address|safe|nl2br }}
+                                    </address>
+                                    
+                                    <h6>Payment Method</h6>
+                                    <p class="mb-0">{{ order.payment_method.replace('_', ' ').title() }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                                                        {% set subtotal = namespace(value=0) %}
+                                    {% for item in order.items %}
+                                        {% set subtotal.value = subtotal.value + (item.price * item.quantity) %}
+                                    {% endfor %}
+                                    {% set tax = order.total_amount - subtotal.value %}
+
+                                    <div class="order-total">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Subtotal:</span>
+                                            <span>${{ "%.2f"|format(subtotal.value) }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Tax:</span>
+                                            <span>${{ "%.2f"|format(tax) }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Shipping:</span>
+                                            <span>FREE</span>
+                                        </div>
+                                        <hr>
+                                        <div class="d-flex justify-content-between fw-bold">
+                                            <span>Total:</span>
+                                            <span>${{ "%.2f"|format(order.total_amount) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                    <h4>No Orders Yet</h4>
+                    <p class="text-muted mb-4">You haven't placed any orders yet. Start shopping to see your order history here.</p>
+                    <a href="{{ url_for('products') }}" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart me-2"></i>Start Shopping
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle order cancellation with confirmation
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.cancel-order-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const orderId = this.getAttribute('data-order-id');
+            
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+                // Submit the form
+                const form = document.querySelector(`.cancel-order-form[data-order-id="${orderId}"]`);
+                if (form) {
+                    form.submit();
+                }
+            }
+        });
+    });
+});
+</script>
+
+<style>
+/* Order status badges */
+.badge-status-pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-status-confirmed {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.badge-status-shipped {
+    background-color: #fd7e14;
+    color: #fff;
+}
+
+.badge-status-delivered {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.badge-status-cancelled {
+    background-color: #6c757d;
+    color: white;
+}
+
+.badge-status-cancelled {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Cancel order button */
+.cancel-order-btn {
+    white-space: nowrap;
+}
+
+.order-item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.order-total {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
+}
+
+@media (max-width: 768px) {
+    .card-header .row > div {
+        margin-bottom: 10px;
+    }
+    
+    .card-header .text-end {
+        text-align: left !important;
+    }
+}
+</style>
+{% endblock %}

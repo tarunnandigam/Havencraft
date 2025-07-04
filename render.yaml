@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: handmademart
+    env: python
+    buildCommand: pip install -r HandmadeMart/requirements.txt
+    startCommand: gunicorn "HandmadeMart.app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
+      - key: FLASK_APP
+        value: "app.py"
+      - key: FLASK_ENV
+        value: "production"
+      - key: SESSION_SECRET
+        generateValue: true
+
+  - type: postgres
+    name: handmademart-db
+    plan: free
+    databaseName: handmademart
+    user: handmademart_user

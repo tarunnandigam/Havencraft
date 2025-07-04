@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar Filters -->
+    <div class="col-lg-3 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h5>
+            </div>
+            <div class="card-body">
+                <!-- Category Filter -->
+                <h6>Categories</h6>
+                <div class="list-group list-group-flush mb-3">
+                    <a href="{{ url_for('products') }}" 
+                       class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+                        All Categories
+                    </a>
+                    {% for category in categories %}
+                    <a href="{{ url_for('products', category=category.id, search=search_query) }}" 
+                       class="list-group-item list-group-item-action {% if current_category == category.id %}active{% endif %}">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Search Filter -->
+                <h6>Search</h6>
+                <form method="GET" action="{{ url_for('products') }}">
+                    {% if current_category %}
+                    <input type="hidden" name="category" value="{{ current_category }}">
+                    {% endif %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" 
+                               placeholder="Search products..." value="{{ search_query }}">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="col-lg-9">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>
+                    {% if current_category %}
+                        {% for category in categories %}
+                            {% if category.id == current_category %}{{ category.name }}{% endif %}
+                        {% endfor %}
+                    {% elif search_query %}
+                        Search Results for "{{ search_query }}"
+                    {% else %}
+                        All Products
+                    {% endif %}
+                </h2>
+                <p class="text-muted">{{ products|length }} product(s) found</p>
+            </div>
+        </div>
+
+        <!-- Products -->
+        {% if products %}
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6">
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none">
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="{{ product.image_url }}" class="product-image" alt="{{ product.name }}">
+                        {% if product.featured %}
+                        <span class="badge bg-warning position-absolute top-0 start-0 m-2">Featured</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted small flex-grow-1">{{ product.description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <span class="h5 mb-0 text-primary">${{ "%.2f"|format(product.price) }}</span>
+                            <button class="btn btn-primary btn-sm add-to-cart-btn" data-product-id="{{ product.id }}" onclick="event.stopPropagation()">
+                                <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- No Products Found -->
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-4x text-muted mb-3"></i>
+            <h4>No products found</h4>
+            <p class="text-muted">Try adjusting your search criteria or browse different categories.</p>
+            <a href="{{ url_for('products') }}" class="btn btn-primary">View All Products</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Quantity control functions for product listings
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle plus button clicks
+    document.querySelectorAll('.quantity-btn.plus').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const input = document.querySelector(`#qty-${productId}`);
+            if (!input) return;
+            
+            let currentValue = parseInt(input.value) || 1;
+            const maxQty = parseInt(input.getAttribute('max')) || 99;
+            
+            if (currentValue < maxQty) {
+                currentValue++;
+                input.value = currentValue;
+                input.dispatchEvent(new Event('change'));
+            } else {
+                alert(`Maximum available quantity is ${maxQty}`);
+            }
+        });
+    });
+
+    // Handle minus button clicks
+    document.querySelectorAll('.quantity-btn.minus').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const input = document.querySelector(`#qty-${productId}`);
+            if (!input) return;
+            
+            let currentValue = parseInt(input.value) || 1;
+            const minQty = parseInt(input.getAttribute('min')) || 1;
+            
+            if (currentValue > minQty) {
+                currentValue--;
+                input.value = currentValue;
+                input.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+
+    // Handle manual input
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const productId = this.dataset.productId;
+            const maxQty = parseInt(this.max);
+            let quantity = parseInt(this.value);
+            
+            if (isNaN(quantity) || quantity < 1) {
+                quantity = 1;
+            } else if (quantity > maxQty) {
+                quantity = maxQty;
+                alert(`Maximum available quantity is ${maxQty}`);
+            }
+            
+            this.value = quantity;
+        });
+
+        // Prevent non-numeric input
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'e' || e.key === 'E' || e.key === '.' || e.key === ',') {
+                e.preventDefault();
+            }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.blur();
+            }
+        });
+    });
+
+    // Handle wishlist button clicks
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            toggleWishlist(productId);
+            
+            // Toggle heart icon
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-danger');
+                this.title = 'Remove from Wishlist';
+            } else {
+                icon.classList.remove('fas', 'text-danger');
+                icon.classList.add('far');
+                this.title = 'Add to Wishlist';
+            }
+        });
+    });
+
+    // Update add to cart to use the selected quantity
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const quantityInput = document.getElementById(`qty-${productId}`);
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            
+            // Trigger add to cart with the selected quantity
+            addToCart(productId, quantity);
+            
+            // Show feedback
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-check"></i> Added!';
+            this.disabled = true;
+            
+            // Reset button after delay
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }, 1500);
+        });
+    });
+});
+</script>
+{% endblock %}

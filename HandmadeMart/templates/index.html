@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}HavenCraft - Handmade Marketplace{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Slider -->
+<section class="hero-section">
+    <div class="hero-slider">
+        <div class="slides">
+            <!-- Slide 1 -->
+            <div class="slide active" style="background-image: url('/static/images/hero/slide1.jpg');">
+                <div class="container h-100">
+                    <div class="slide-content">
+                        <h1>Discover Handcrafted Treasures</h1>
+                        <p class="lead">Explore unique, one-of-a-kind pieces made with passion and skill by talented artisans worldwide.</p>
+                        <div class="hero-actions">
+                            <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">Shop Now</a>
+                            {% if not current_user.is_authenticated %}
+                            <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg">Join Our Community</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 2 -->
+            <div class="slide" style="background-image: url('/static/images/hero/slide2.jpg');">
+                <div class="container h-100">
+                    <div class="slide-content">
+                        <h1>Support Artisan Craftsmanship</h1>
+                        <p class="lead">Every purchase helps sustain traditional crafts and supports independent makers.</p>
+                        <div class="hero-actions">
+                            <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">Browse Collection</a>
+                            <a href="#featured" class="btn btn-outline-light btn-lg">Featured Items</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 3 -->
+            <div class="slide" style="background-image: url('/static/images/hero/slide3.jpg');">
+                <div class="container h-100">
+                    <div class="slide-content">
+                        <h1>Handmade with Love</h1>
+                        <p class="lead">Find the perfect handcrafted gift for your loved ones or treat yourself to something special.</p>
+                        <div class="hero-actions">
+                            <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">Discover More</a>
+                            <a href="#categories" class="btn btn-outline-light btn-lg">Shop by Category</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slider Navigation -->
+        <div class="slider-nav">
+            <div class="slider-dot active" data-slide="0"></div>
+            <div class="slider-dot" data-slide="1"></div>
+            <div class="slider-dot" data-slide="2"></div>
+        </div>
+        
+        <!-- Slider Arrows -->
+        <div class="slider-arrow prev">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="slider-arrow next">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-item">
+                    <h3 class="text-primary mb-1">{{ products|length }}+</h3>
+                    <small class="text-muted">Handmade Products</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-item">
+                    <h3 class="text-primary mb-1">500+</h3>
+                    <small class="text-muted">Talented Artisans</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-item">
+                    <h3 class="text-primary mb-1">50+</h3>
+                    <small class="text-muted">Countries</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-item">
+                    <h3 class="text-primary mb-1">10K+</h3>
+                    <small class="text-muted">Happy Customers</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="h1 mb-3">Shop by Category</h2>
+            <p class="text-muted">Explore our curated collection of handmade treasures</p>
+        </div>
+        <div class="row g-4">
+            {% set category_icons = {
+                'Jewelry': 'fas fa-gem',
+                'Pottery': 'fas fa-wine-glass-alt',
+                'Textiles': 'fas fa-tshirt',
+                'Woodwork': 'fas fa-hammer',
+                'Home Decor': 'fas fa-home',
+                'Art & Crafts': 'fas fa-paint-brush'
+            } %}
+            {% for category in categories %}
+            <div class="col-lg-2 col-md-4 col-6">
+                <a href="{{ url_for('products', category=category.id) }}" class="text-decoration-none">
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <i class="{{ category_icons.get(category.name, 'fas fa-heart') }}"></i>
+                        </div>
+                        <h5>{{ category.name }}</h5>
+                        <p>{{ category.description }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+{% if featured_products %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align_items-center mb-4">
+            <div>
+                <h2 class="h1 mb-2">Featured Products</h2>
+                <p class="text-muted">Handpicked by our curators</p>
+            </div>
+            <a href="{{ url_for('products') }}" class="btn btn-outline-primary">View All</a>
+        </div>
+        <div class="row g-4">
+            {% for product in featured_products[:4] %}
+            <div class="col-lg-3 col-md-6">
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none">
+                <div class="product-card">
+                    <div class="product-image-container">
+                        {% if product.featured %}
+                        <span class="badge bg-warning position-absolute top-0 start-0 m-2">Featured</span>
+                        {% endif %}
+                        <img src="{{ product.image_url }}" class="product-image" alt="{{ product.name }}">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted small flex-grow-1">{{ product.description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <span class="h5 mb-0 text-primary">${{ "%.2f"|format(product.price) }}</span>
+                            <button class="btn btn-primary btn-sm add-to-cart-btn" data-product-id="{{ product.id }}" onclick="event.stopPropagation()">
+                                <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Best Sellers -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="h1 mb-3">Best Sellers</h2>
+            <p class="text-muted">Most loved by our community</p>
+        </div>
+        <div class="row g-4">
+            {% for product in products[:6] %}
+            <div class="col-lg-4 col-md-6">
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none">
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <img src="{{ product.image_url }}" class="product-image" alt="{{ product.name }}">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted small flex-grow-1">{{ product.description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <span class="h5 mb-0 text-primary">${{ "%.2f"|format(product.price) }}</span>
+                            <button class="btn btn-primary btn-sm add-to-cart-btn" data-product-id="{{ product.id }}" onclick="event.stopPropagation()">
+                                <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose HavenCraft -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="h1 mb-3">Why Choose HavenCraft?</h2>
+            <p class="text-muted">Supporting artisans, preserving traditions, creating connections</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-hands"></i>
+                </div>
+                <h5>Authentic Handmade</h5>
+                <p class="text-muted">Every item is genuinely handcrafted by skilled artisans using traditional techniques passed down through generations.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h5>Support Artisans</h5>
+                <p class="text-muted">Your purchase directly supports independent makers and helps preserve traditional crafts around the world.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h5>Quality Guaranteed</h5>
+                <p class="text-muted">We carefully curate every product and stand behind the quality of all items in our marketplace.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Signup -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h3 class="h2 mb-2">Stay Connected</h3>
+                <p class="mb-0">Get updates on new artisans, exclusive collections, and special offers</p>
+            </div>
+            <div class="col-lg-6">
+                <form class="d-flex gap-2">
+                    <input type="email" class="form-control" placeholder="Enter your email">
+                    <button type="submit" class="btn btn-light">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
