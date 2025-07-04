@@ -19,11 +19,16 @@ def create_app():
     app.secret_key = os.environ.get("SESSION_SECRET", "a_default_secret_key_that_should_be_changed")
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-    # Database configuration - using SQLite for local development
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///handmademart.db'
+    # Database configuration - use DATABASE_URL from environment variables
+    database_uri = os.environ.get('DATABASE_URL', 'sqlite:///handmademart.db')
+    if database_uri.startswith('postgres://'):
+        database_uri = database_uri.replace('postgres://', 'postgresql://', 1)
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_recycle': 300,
         'pool_pre_ping': True,
+        'connect_args': {'sslmode': 'require'}
     }
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
