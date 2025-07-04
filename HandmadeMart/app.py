@@ -10,10 +10,10 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 migrate = Migrate()
 
-# Create the app outside of create_app to avoid circular imports
-app = Flask(__name__)
-
 def create_app():
+    # Create the Flask application
+    app = Flask(__name__)
+    
     # Configure logging for debugging
     logging.basicConfig(level=logging.DEBUG)
 
@@ -40,6 +40,15 @@ def create_app():
 
     # Import models after db initialization to avoid circular imports
     from . import models
+    
+    # Initialize database within app context
+    with app.app_context():
+        # Create tables if they don't exist
+        db.create_all()
+        # Initialize sample data
+        models.init_db()
+    
+    return app
     
     # Import and register blueprints
     from .routes import main as main_blueprint
