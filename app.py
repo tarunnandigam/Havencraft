@@ -43,12 +43,19 @@ with app.app_context():
     
     # Create all tables
     try:
+        print("Creating database tables...")
         db.create_all()
+        print("Database tables created successfully!")
+        
         # Initialize sample data if database is empty
         if not db.session.query(db.exists().select_from(db.metadata.tables['product'])).scalar():
+            print("Initializing sample data...")
             init_sample_data()
+            print("Sample data initialized!")
     except Exception as e:
-        app.logger.error(f"Failed to initialize database: {e}")
+        print(f"Error initializing database: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise
 
 if __name__ == "__main__":
