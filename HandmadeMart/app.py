@@ -6,9 +6,10 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_migrate import Migrate
 
 # Add the current directory to the Python path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
 
-# Import local modules
+# Import extensions
 from extensions import db
 
 # Configure logging for debugging
@@ -36,13 +37,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
 
+# Import models and routes after db initialization
+from models import Category, Product, User, Wishlist, Order, OrderItem, init_sample_data
+import auth_routes
+import routes
+
+# Register blueprints if any
+# app.register_blueprint(auth_routes.bp)
+# app.register_blueprint(routes.bp)
+
 with app.app_context():
-    # Import models first to ensure tables are defined
-    from HandmadeMart.models import init_sample_data
-    
-    # Import routes after models are defined
-    from HandmadeMart import auth_routes, routes
-    
     # Create all tables
     db.create_all()
     
