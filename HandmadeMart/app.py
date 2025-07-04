@@ -10,12 +10,14 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 migrate = Migrate()
 
+# Create the app outside of create_app to avoid circular imports
+app = Flask(__name__)
+
 def create_app():
     # Configure logging for debugging
     logging.basicConfig(level=logging.DEBUG)
 
-    # Create the app
-    app = Flask(__name__)
+    # Configure the app
     app.secret_key = os.environ.get("SESSION_SECRET", "a_default_secret_key_that_should_be_changed")
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
