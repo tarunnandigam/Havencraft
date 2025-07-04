@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Order Canceled - HavenCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle text-danger" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="mb-4">Order Canceled</h2>
+                    <p class="lead mb-4">Your order <strong>#{{ order.id }}</strong> has been canceled.</p>
+                    
+                    <div class="card bg-light p-4 mb-4 text-start">
+                        <h5 class="mb-3">Order Summary</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Order Number:</strong> #{{ order.id }}</p>
+                                <p class="mb-2"><strong>Date Canceled:</strong> {{ order.updated_at.strftime('%B %d, %Y %I:%M %p') }}</p>
+                                <p class="mb-2"><strong>Status:</strong> 
+                                    <span class="badge bg-danger">Canceled</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Total Amount:</strong> ${{ "%.2f"|format(order.total_amount) }}</p>
+                                <p class="mb-2"><strong>Payment Method:</strong> {{ order.payment_method|title }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-muted mb-4">
+                        If you have any questions about your canceled order, please don't hesitate to 
+                        <a href="{{ url_for('contact') }}">contact our support team</a>.
+                    </p>
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('products') }}" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                        </a>
+                        <a href="{{ url_for('user_profile') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-user me-2"></i>My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

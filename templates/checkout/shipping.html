@@ -96,7 +96,7 @@
                                 <option value="">Choose...</option>
                                 <option value="US" {% if user_info.get('country', 'US') == 'US' %}selected{% endif %}>United States</option>
                                 <option value="CA" {% if user_info.get('country') == 'CA' %}selected{% endif %}>Canada</option>
-                                <option value="MX" {% if user_info.get('country') == 'MX' %}selected{% endif %}>Mexico</option>
+                                <option value="MX" {% if user_info.get('country') == 'MX' %}selected{% endif %}>India</option>
                                 <option value="GB" {% if user_info.get('country') == 'GB' %}selected{% endif %}>United Kingdom</option>
                                 <option value="FR" {% if user_info.get('country') == 'FR' %}selected{% endif %}>France</option>
                                 <option value="DE" {% if user_info.get('country') == 'DE' %}selected{% endif %}>Germany</option>
@@ -104,6 +104,7 @@
                                 <option value="ES" {% if user_info.get('country') == 'ES' %}selected{% endif %}>Spain</option>
                                 <option value="AU" {% if user_info.get('country') == 'AU' %}selected{% endif %}>Australia</option>
                                 <option value="JP" {% if user_info.get('country') == 'JP' %}selected{% endif %}>Japan</option>
+                                <option value="JP" {% if user_info.get('country') == 'JP' %}selected{% endif %}>Other</option>
                             </select>
                             <div class="invalid-feedback">Please select a valid country.</div>
                         </div>

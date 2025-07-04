@@ -95,6 +95,7 @@ def register():
             return redirect(url_for('login'))
         except Exception as e:
             db.session.rollback()
+            app.logger.error(f'Error during registration: {e}')
             flash('An error occurred during registration. Please try again.', 'error')
     
     return render_template('auth/register.html')
@@ -143,9 +144,10 @@ def edit_profile():
         try:
             db.session.commit()
             flash('Profile updated successfully!', 'success')
-            return redirect(url_for('profile'))
+            return redirect(url_for('user_profile'))
         except Exception as e:
             db.session.rollback()
             flash('An error occurred while updating your profile.', 'error')
     
+    # Handle GET request
     return render_template('auth/edit_profile.html', user=current_user)

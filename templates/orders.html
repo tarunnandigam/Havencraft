@@ -27,10 +27,20 @@
                                 <strong>${{ "%.2f"|format(order.total_amount) }}</strong>
                             </div>
                             <div class="col-md-3 text-end">
-                                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" 
-                                        data-bs-target="#order-{{ order.id }}" aria-expanded="false">
-                                    View Details
-                                </button>
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#order-{{ order.id }}" aria-expanded="false">
+                                        View Details
+                                    </button>
+                                    {% if order.status in ['pending', 'confirmed'] %}
+                                    <form action="{{ url_for('cancel_order', order_id=order.id) }}" method="POST" class="cancel-order-form" data-order-id="{{ order.id }}">
+                                        <button type="button" class="btn btn-sm btn-outline-danger cancel-order-btn" 
+                                                data-order-id="{{ order.id }}">
+                                            Cancel Order
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -71,14 +81,20 @@
                             
                             <div class="row mt-3">
                                 <div class="col-md-12">
+                                                                        {% set subtotal = namespace(value=0) %}
+                                    {% for item in order.items %}
+                                        {% set subtotal.value = subtotal.value + (item.price * item.quantity) %}
+                                    {% endfor %}
+                                    {% set tax = order.total_amount - subtotal.value %}
+
                                     <div class="order-total">
                                         <div class="d-flex justify-content-between">
                                             <span>Subtotal:</span>
-                                            <span>${{ "%.2f"|format(order.total_amount / 1.08) }}</span>
+                                            <span>${{ "%.2f"|format(subtotal.value) }}</span>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <span>Tax:</span>
-                                            <span>${{ "%.2f"|format(order.total_amount * 0.08 / 1.08) }}</span>
+                                            <span>${{ "%.2f"|format(tax) }}</span>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <span>Shipping:</span>
@@ -110,7 +126,29 @@
     </div>
 </div>
 
+<script>
+// Handle order cancellation with confirmation
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.cancel-order-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const orderId = this.getAttribute('data-order-id');
+            
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+                // Submit the form
+                const form = document.querySelector(`.cancel-order-form[data-order-id="${orderId}"]`);
+                if (form) {
+                    form.submit();
+                }
+            }
+        });
+    });
+});
+</script>
+
 <style>
+/* Order status badges */
 .badge-status-pending {
     background-color: #ffc107;
     color: #000;
@@ -132,8 +170,18 @@
 }
 
 .badge-status-cancelled {
+    background-color: #6c757d;
+    color: white;
+}
+
+.badge-status-cancelled {
     background-color: #dc3545;
-    color: #fff;
+    color: white;
+}
+
+/* Cancel order button */
+.cancel-order-btn {
+    white-space: nowrap;
 }
 
 .order-item-image {

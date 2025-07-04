@@ -188,20 +188,14 @@ function initializeFormValidation() {
 
 // Loading states for buttons
 function initializeLoadingStates() {
-    document.addEventListener('click', function(e) {
-        if (e.target.matches('.btn[type="submit"]')) {
-            const button = e.target;
-            const originalText = button.innerHTML;
-            
-            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Loading...';
-            button.disabled = true;
-            
-            // Reset after form submission or timeout
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 3000);
-        }
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const button = form.querySelector('.btn[type="submit"]');
+            if (button) {
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Loading...';
+                button.disabled = true;
+            }
+        });
     });
 }
 

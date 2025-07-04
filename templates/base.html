@@ -42,6 +42,23 @@
                 <span class="brand-text">HavenCraft</span>
             </a>
 
+            <div class="dropdown d-none d-lg-block me-3">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="categoriesDropdown" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bars me-1"></i> Categories
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('products') }}">All Products</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ url_for('products', category=1) }}">Jewelry</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('products', category=2) }}">Pottery</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('products', category=3) }}">Textiles</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('products', category=4) }}">Woodwork</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('products', category=5) }}">Home Decor</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('products', category=6) }}">Art & Crafts</a></li>
+                </ul>
+            </div>
+            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -70,7 +87,7 @@
                                 <span>{{ current_user.get_full_name() }}</span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('user_profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('wishlist') }}"><i class="fas fa-heart me-2"></i>Wishlist <span class="badge bg-primary ms-1">{{ wishlist_count }}</span></a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('order_history') }}"><i class="fas fa-box me-2"></i>Orders</a></li>
                                 <li><hr class="dropdown-divider"></li>
@@ -232,6 +249,7 @@
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/hero-slider.js') }}"></script>
 
     {% block extra_scripts %}{% endblock %}
 </body>

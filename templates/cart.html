@@ -33,12 +33,18 @@
                         
                         <!-- Quantity -->
                         <div class="col-md-2 text-center">
-                            <div class="input-group input-group-sm">
-                                <button type="button" class="btn btn-outline-secondary" onclick="decreaseQuantity('{{ item.product.id }}')">-</button>
+                            <div class="quantity-selector d-flex align-items-center justify-content-center">
+                                <button type="button" class="quantity-btn minus" onclick="decreaseQuantity('{{ item.product.id }}')">
+                                    <i class="fas fa-minus"></i>
+                                </button>
                                 <input type="number" name="quantity_{{ item.product.id }}" 
-                                       value="{{ item.quantity }}" min="0" max="{{ item.product.stock_quantity }}"
-                                       class="form-control text-center" id="qty_{{ item.product.id }}">
-                                <button type="button" class="btn btn-outline-secondary" onclick="increaseQuantity('{{ item.product.id }}', {{ item.product.stock_quantity }})">+</button>
+                                       value="{{ item.quantity }}" min="1" max="{{ item.product.stock_quantity }}"
+                                       class="quantity-input" id="qty_{{ item.product.id }}" 
+                                       onchange="updateQuantityManually('{{ item.product.id }}', this.value, {{ item.product.stock_quantity }})" 
+                                       onkeydown="return event.key !== 'e' && event.key !== 'E' && event.key !== '.' && event.key !== ',';">
+                                <button type="button" class="quantity-btn plus" onclick="increaseQuantity('{{ item.product.id }}', {{ item.product.stock_quantity }})">
+                                    <i class="fas fa-plus"></i>
+                                </button>
                             </div>
                         </div>
                         
@@ -85,7 +91,7 @@
             <div class="card-body">
                 <div class="row mb-2">
                     <div class="col">Subtotal:</div>
-                    <div class="col-auto">${{ "%.2f"|format(total) }}</div>
+                    <div class="col-auto">${{ "%.2f"|format(subtotal) }}</div>
                 </div>
                 <div class="row mb-2">
                     <div class="col">Shipping:</div>
@@ -93,12 +99,12 @@
                 </div>
                 <div class="row mb-2">
                     <div class="col">Tax:</div>
-                    <div class="col-auto">${{ "%.2f"|format(total * 0.08) }}</div>
+                    <div class="col-auto">${{ "%.2f"|format(tax) }}</div>
                 </div>
                 <hr>
                 <div class="row mb-3">
                     <div class="col"><strong>Total:</strong></div>
-                    <div class="col-auto"><strong>${{ "%.2f"|format(total * 1.08) }}</strong></div>
+                    <div class="col-auto"><strong>${{ "%.2f"|format(total) }}</strong></div>
                 </div>
                 
                 <a href="{{ url_for('checkout') }}" class="btn btn-success btn-lg w-100 mb-3">
@@ -130,11 +136,18 @@
 
 {% block extra_scripts %}
 <script>
+// Load cart.js script
+const script = document.createElement('script');
+script.src = "{{ url_for('static', filename='js/cart.js') }}";
+document.head.appendChild(script);
+
 function increaseQuantity(productId, maxQty) {
     const input = document.getElementById(`qty_${productId}`);
     const currentValue = parseInt(input.value);
     if (currentValue < maxQty) {
         input.value = currentValue + 1;
+        // Update cart via AJAX
+        updateCartQuantity(productId, currentValue + 1);
     }
 }
 
@@ -143,7 +156,113 @@ function decreaseQuantity(productId) {
     const currentValue = parseInt(input.value);
     if (currentValue > 1) {
         input.value = currentValue - 1;
+        // Update cart via AJAX
+        updateCartQuantity(productId, currentValue - 1);
+    } else if (currentValue === 1) {
+        // If quantity would be 0, remove the item
+        if (confirm('Remove this item from cart?')) {
+            window.location.href = `/remove_from_cart/${productId}`;
+        }
     }
 }
+
+// Update cart quantity via AJAX
+async function updateCartQuantity(productId, quantity) {
+    try {
+        const response = await fetch('/update_cart_quantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `product_id=${productId}&quantity=${quantity}`
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update the cart count in the navbar
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount) {
+                cartCount.textContent = data.cart_count;
+            }
+            
+            // Update the subtotal for this item
+            const subtotalElement = document.getElementById(`subtotal-${productId}`);
+            if (subtotalElement) {
+                subtotalElement.textContent = `$${data.subtotal.toFixed(2)}`;
+            }
+            
+            // Update the order summary
+            if (data.order_summary) {
+                const { subtotal, tax, total } = data.order_summary;
+                const subtotalElement = document.querySelector('.order-summary-subtotal');
+                const taxElement = document.querySelector('.order-summary-tax');
+                const totalElement = document.querySelector('.order-summary-total');
+                
+                if (subtotalElement) subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+                if (taxElement) taxElement.textContent = `$${tax.toFixed(2)}`;
+                if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
+            }
+        } else {
+            console.error('Failed to update cart:', data.message);
+            // Revert the input value on error
+            const input = document.getElementById(`qty_${productId}`);
+            input.value = data.current_quantity || 1;
+            
+            if (data.message) {
+                alert(data.message);
+            }
+        }
+    } catch (error) {
+        console.error('Error updating cart:', error);
+        alert('An error occurred while updating the cart. Please try again.');
+    }
+}
+
+// Handle manual quantity input
+function updateQuantityManually(productId, value, maxQty) {
+    let quantity = parseInt(value);
+    
+    // Validate the input
+    if (isNaN(quantity) || quantity < 1) {
+        quantity = 1;
+    } else if (quantity > maxQty) {
+        quantity = maxQty;
+        alert(`Maximum available quantity is ${maxQty}`);
+    }
+    
+    // Update the input value
+    const input = document.getElementById(`qty_${productId}`);
+    if (input) {
+        input.value = quantity;
+    }
+    
+    // Update the cart
+    updateCartQuantity(productId, quantity);
+}
+
+// Add event listeners when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Update the cart count on page load
+    fetch('/get_cart_count')
+        .then(response => response.json())
+        .then(data => {
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount && data.cart_count !== undefined) {
+                cartCount.textContent = data.cart_count;
+            }
+        });
+        
+    // Prevent form submission on Enter key in quantity inputs
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.blur(); // Remove focus to trigger the onchange event
+            }
+        });
+    });
+});
 </script>
 {% endblock %}
