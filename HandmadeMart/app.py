@@ -44,12 +44,19 @@ def create_app():
     # Import models after db initialization to avoid circular imports
     from . import models
     
-    # Initialize database within app context
-    with app.app_context():
-        # Create tables if they don't exist
-        db.create_all()
-        # Initialize sample data
-        models.init_db()
+    def init_db():
+        """Initialize the database with tables and sample data"""
+        with app.app_context():
+            # Create tables if they don't exist
+            db.create_all()
+            # Initialize sample data
+            from . import models
+            models.init_db()
+    
+    # Initialize database on first request
+    @app.before_first_request
+    def initialize_database():
+        init_db()
     
     return app
     
