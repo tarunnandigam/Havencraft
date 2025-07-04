@@ -1,17 +1,26 @@
-import sys
 import os
+import sys
+from pathlib import Path
 
-# Add the parent directory to the Python path
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, base_dir)
+# Add the project directory to the Python path
+project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
 
-# Now import the app
-from app import app, init_db
-
-# Initialize the database
-init_db()
-
-application = app
+try:
+    from HandmadeMart.app import create_app
+    
+    # Create the application instance
+    application = create_app()
+    
+    # Initialize the database
+    with application.app_context():
+        from HandmadeMart.models import db
+        db.create_all()
+        print("Database tables created successfully")
+        
+except Exception as e:
+    print(f"Error initializing application: {str(e)}")
+    raise
 
 if __name__ == "__main__":
     application.run()
