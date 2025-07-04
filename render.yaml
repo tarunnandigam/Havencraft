@@ -1,21 +1,27 @@
 services:
   - type: web
-    name: handmademart
+    name: havencraft-website
     env: python
-    buildCommand: pip install -r HandmadeMart/requirements.txt
-    startCommand: gunicorn "HandmadeMart.app:app"
+    buildCommand: |
+      pip install -r requirements.txt
+      python -m pip install --upgrade pip
+    startCommand: gunicorn "HandmadeMart.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.0
       - key: FLASK_APP
-        value: "app.py"
+        value: "HandmadeMart.app"
       - key: FLASK_ENV
         value: "production"
       - key: SESSION_SECRET
         generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: havencraft-db
+          property: connectionString
 
   - type: postgres
-    name: handmademart-db
+    name: havencraft-db
     plan: free
-    databaseName: handmademart
-    user: handmademart_user
+    databaseName: havencraft
+    user: havencraft_user

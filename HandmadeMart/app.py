@@ -1,9 +1,15 @@
 import os
+import sys
 import logging
 from flask import Flask, jsonify
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_migrate import Migrate
-from extensions import db
+
+# Add the parent directory to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Now import using the full package path
+from HandmadeMart.extensions import db
 
 # Configure logging for debugging
 logging.basicConfig(level=logging.DEBUG)
