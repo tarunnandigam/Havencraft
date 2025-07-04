@@ -48,19 +48,22 @@ from auth_routes import auth as auth_blueprint
 app.register_blueprint(main_blueprint)
 app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
-# Initialize database
 def init_db():
-    with app.app_context():
-        # Create all tables
-        db.create_all()
-        
-        # Initialize sample data if database is empty
-        if not Category.query.first():
-            init_sample_data()
-            print("Sample data initialized")
-
-# Initialize the database
-init_db()
+    """Initialize the database and create tables."""
+    try:
+        with app.app_context():
+            # Create all tables
+            db.create_all()
+            print("Database tables created successfully")
+            
+            # Initialize sample data if database is empty
+            if not Category.query.first():
+                print("Initializing sample data...")
+                init_sample_data()
+                print("Sample data initialized")
+    except Exception as e:
+        print(f"Error initializing database: {str(e)}")
+        raise
 
 # At the bottom of app.py, add:
 @app.route('/health')
@@ -68,17 +71,8 @@ def health_check():
     return jsonify({'status': 'healthy'}), 200
 
 if __name__ == '__main__':
-    with app.app_context():
-        # Create all database tables
-        db.create_all()
-        
-        # Initialize sample data if needed
-        from models import init_sample_data
-        if not db.session.query(db.exists().select_from(db.metadata.tables['product'])).scalar():
-            try:
-                init_sample_data()
-            except Exception as e:
-                app.logger.error(f"Error initializing sample data: {str(e)}")
+    # Initialize the database when running directly
+    init_db()
     
     # Run the app
     port = int(os.environ.get('PORT', 5000))
