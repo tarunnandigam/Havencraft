@@ -37,22 +37,30 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# Import models and routes after db initialization
+# Import models after db initialization
 from models import Category, Product, User, Wishlist, Order, OrderItem, init_sample_data
-import auth_routes
-import routes
 
-# Register blueprints if any
-# app.register_blueprint(auth_routes.bp)
-# app.register_blueprint(routes.bp)
+# Import routes after models are defined
+from routes import main as main_blueprint
+from auth_routes import auth as auth_blueprint
 
-with app.app_context():
-    # Create all tables
-    db.create_all()
-    
-    # Initialize sample data if database is empty
-    if not db.session.query(db.exists().select_from(db.metadata.tables['product'])).scalar():
-        init_sample_data()
+# Register blueprints
+app.register_blueprint(main_blueprint)
+app.register_blueprint(auth_blueprint, url_prefix='/auth')
+
+# Initialize database
+def init_db():
+    with app.app_context():
+        # Create all tables
+        db.create_all()
+        
+        # Initialize sample data if database is empty
+        if not Category.query.first():
+            init_sample_data()
+            print("Sample data initialized")
+
+# Initialize the database
+init_db()
 
 # At the bottom of app.py, add:
 @app.route('/health')
